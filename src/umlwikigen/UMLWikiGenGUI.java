@@ -1,6 +1,7 @@
 package umlwikigen;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -20,27 +21,28 @@ public class UMLWikiGenGUI extends JFrame {
 
         // Declare GUI elements
         this.setTitle("UML Wiki Generator");
+        JPanel panel = new JPanel();
+        add(panel);
         JButton chooseFileButton = new JButton("Choose file");
         JLabel fileNameLabel = new JLabel("No file selected");
         JButton submitButton = new JButton("Submit");
         JFileChooser fileChooser = new JFileChooser();
         final MagicDrawUMLImageExtractor imageExtractor = new MagicDrawUMLImageExtractor(currentlySelectedFile);
 
-        setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+        submitButton.setEnabled(false); // Set submit button to disabled by default, enables when user selects file
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         fileChooser.setFileFilter(new FileNameExtensionFilter("MagicDraw Project Files", "mdzip"));
-
-
 
         // Register button listeners
         chooseFileButton.addActionListener((ActionEvent e) -> {
             int returnVal = fileChooser.showOpenDialog(this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 // User successfully chose a .mdzip
-                currentlySelectedFile = fileChooser.getSelectedFile();
+                this.currentlySelectedFile = fileChooser.getSelectedFile();
                 fileNameLabel.setText(currentlySelectedFile.getName());
                 submitButton.setEnabled(true);
             } else {
-                currentlySelectedFile = null;
+                this.currentlySelectedFile = null;
                 fileNameLabel.setText("No file selected");
                 submitButton.setEnabled(false);
             }
@@ -59,12 +61,23 @@ public class UMLWikiGenGUI extends JFrame {
             imageExtractor.launch(defaultArgs);
         });
 
-        add(chooseFileButton);
-        add(fileNameLabel);
-        add(submitButton);
+        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        chooseFileButton.setAlignmentX(CENTER_ALIGNMENT);
+        fileNameLabel.setAlignmentX(CENTER_ALIGNMENT);
+        submitButton.setAlignmentX(CENTER_ALIGNMENT);
+        chooseFileButton.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 24));
+        fileNameLabel.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 24));
+        submitButton.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 24));
+        panel.add(chooseFileButton);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(fileNameLabel);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(submitButton);
 
+        add(panel);
         setVisible(true);
-        setSize(new Dimension(500, 500));
+        pack();
+        setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }
