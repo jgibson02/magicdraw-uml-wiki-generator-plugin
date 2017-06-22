@@ -88,6 +88,7 @@ public class MagicDrawUMLImageExtractor extends CommandLine {
     }
 
     public String getWikiPage() { return this.wikiPage; }
+    public void setProjectFile(File f) { this.projectFile = f; }
 
     //=======================================================
     // PRIVATE METHODS
