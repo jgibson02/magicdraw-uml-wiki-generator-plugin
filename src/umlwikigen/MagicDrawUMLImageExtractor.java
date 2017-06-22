@@ -8,19 +8,19 @@ import com.nomagic.magicdraw.core.project.ProjectDescriptorsFactory;
 import com.nomagic.magicdraw.core.project.ProjectsManager;
 import com.nomagic.magicdraw.export.image.ImageExporter;
 import com.nomagic.magicdraw.uml.symbols.DiagramPresentationElement;
-import com.nomagic.runtime.ApplicationExitedException;
 
 import java.io.File;
 import java.util.Calendar;
 import java.util.Collection;
 
-/**
- * The purpose of this class is to start MagicDraw and export all the
- * files of a given project to a given folder
- */
 public class MagicDrawUMLImageExtractor extends CommandLine {
-    public static void main(String[] args) {
-        new MagicDrawUMLImageExtractor().launch(args);
+
+    private File projectFile;
+    private String wikiPage;
+
+    public MagicDrawUMLImageExtractor(File projectFile) {
+        this.projectFile = projectFile;
+        this.wikiPage = "";
     }
 
     /**
@@ -33,27 +33,22 @@ public class MagicDrawUMLImageExtractor extends CommandLine {
     @Override
     protected byte execute() {
         String destination =  "s:\\SiteAssets\\";
-        String username = System.getProperty("user.name");
-        String projectLocation = "C:\\Users\\" + username + "\\Desktop\\NIFS " +
-                "MagicDraw\\FUELEAP_NIFS_v75.mdzip";
+        // String projectLocation = "C:\\Users\\jhgibso1\\Desktop\\NIFS " +
+        //"MagicDraw\\FUELEAP_NIFS_v75.mdzip";
         // Create file for given project and check if it exists
-        final File file = new File(projectLocation);
-        final ProjectDescriptor projectDescriptor =
-                ProjectDescriptorsFactory.createProjectDescriptor(file.toURI());
+        // final File file = new File(projectLocation);
+        final ProjectDescriptor projectDescriptor = ProjectDescriptorsFactory.createProjectDescriptor(projectFile.toURI());
         if (projectDescriptor == null) {
-            System.out.println("Project descriptor was not created for " +
-                    file.getAbsolutePath());
+            System.out.println("Project descriptor was not created for " + projectFile.getAbsolutePath());
             return -1;
         }
         // Get project manager and load project
-        final ProjectsManager projectsManager = Application.getInstance()
-                .getProjectsManager();
+        final ProjectsManager projectsManager = Application.getInstance().getProjectsManager();
         projectsManager.loadProject(projectDescriptor, true);
         final Project project = projectsManager.getActiveProject();
         // Check if project was loaded
         if (project == null) {
-            System.out.println("Project " + file.getAbsolutePath() + " was " +
-                    "not loaded.");
+            System.out.println("Project " + projectFile.getAbsolutePath() + " was not loaded.");
             return -1;
         }
         // Create file destination string with
@@ -65,40 +60,38 @@ public class MagicDrawUMLImageExtractor extends CommandLine {
         if (makeNewDirectory(fileLoc)) {
             // Send a msg to the user and begin exporting diagrams to project
             Collection diagrams = project.getDiagrams();
-            // Go through each diagram and export it with the diagrams name +
-            // .jpg
+            // Go through each diagram and export it with the diagrams name + .jpg
             double count = 0;
             double total = (double) diagrams.size();
             System.out.println("0% Complete");
+            String wikiPage = "<html><title>"+project.getName()+"</title><body>";
             for (Object d : diagrams) {
                 DiagramPresentationElement dpe =
                         (DiagramPresentationElement) d;
                 try {
                     File img = new File(fileLoc + '\\' + dpe.getDiagram()
-                            .getName() + ".jpg");
-                    ImageExporter.export(dpe, ImageExporter.JPEG, img);
+                            .getName() + ".svg");
+                    ImageExporter.export(dpe, ImageExporter.SVG, img);
+                    wikiPage += "<img src=\"" + img.getAbsoluteFile() + "/><br/>";
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                dpe.close();
                 count++;
-                System.out.println((int) Math.round(((count / total) * 100)) +
-                        "% " + "Complete");
+                System.out.println((int) Math.round(((count / total) * 100)) + "% " + "Complete");
             }
+            wikiPage += "</body></html>";
         }
-        try {
-            Application.getInstance().shutdown();
-        } catch (ApplicationExitedException e){
-            e.printStackTrace();
-            return -1;
-        }
-//        System.exit(0);
+        projectsManager.closeProject();
+
         return 0;
     }
-    /*
-    =======================================================
-    PRIVATE METHODS
-    =======================================================
-    */
+
+    public String getWikiPage() { return this.wikiPage; }
+
+    //=======================================================
+    // PRIVATE METHODS
+    //=======================================================
 
     /**
      * Creates a diagram for a given project
@@ -122,7 +115,7 @@ public class MagicDrawUMLImageExtractor extends CommandLine {
         return result;
     }
 
-    /** 
+    /**
      * Creates the current date and time with the format YYYYMMDD'T'HHmmss as
      * a string
      *
@@ -206,4 +199,3 @@ public class MagicDrawUMLImageExtractor extends CommandLine {
         return success;
     }
 }
-
