@@ -13,6 +13,9 @@ import java.io.File;
 import java.util.Calendar;
 import java.util.Collection;
 
+/**
+ *
+ */
 public class MagicDrawUMLImageExtractor extends CommandLine {
 
     private File projectFile;
