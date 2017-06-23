@@ -67,7 +67,7 @@ public class MagicDrawUMLImageExtractor extends CommandLine {
             double count = 0;
             double total = (double) diagrams.size();
             System.out.println("0% Complete");
-            String wikiPage = "<html><title>"+project.getName()+"</title><body>";
+
             for (Object d : diagrams) {
                 DiagramPresentationElement dpe =
                         (DiagramPresentationElement) d;
@@ -75,7 +75,6 @@ public class MagicDrawUMLImageExtractor extends CommandLine {
                     File img = new File(fileLoc + '\\' + dpe.getDiagram()
                             .getName() + ".svg");
                     ImageExporter.export(dpe, ImageExporter.SVG, img);
-                    wikiPage += "<img src=\"" + img.getAbsoluteFile() + "/><br/>";
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -83,14 +82,13 @@ public class MagicDrawUMLImageExtractor extends CommandLine {
                 count++;
                 System.out.println((int) Math.round(((count / total) * 100)) + "% " + "Complete");
             }
-            wikiPage += "</body></html>";
+
         }
         projectsManager.closeProject();
 
         return 0;
     }
 
-    public String getWikiPage() { return this.wikiPage; }
     public void setProjectFile(File f) { this.projectFile = f; }
 
     //=======================================================
