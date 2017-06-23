@@ -9,7 +9,11 @@ import com.nomagic.magicdraw.core.project.ProjectsManager;
 import com.nomagic.magicdraw.export.image.ImageExporter;
 import com.nomagic.magicdraw.uml.symbols.DiagramPresentationElement;
 
+import java.awt.*;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collection;
 
@@ -83,6 +87,18 @@ public class MagicDrawUMLImageExtractor extends CommandLine {
                 System.out.println((int) Math.round(((count / total) * 100)) + "% " + "Complete");
             }
 
+        }
+
+        File htmlOutputFile = new File("S:\\Wiki Pages\\" + WikiPageGenerator.removeFileExtension(projectFile) + ".html");
+        String htmlOutputString = WikiPageGenerator.generateWikiString(fileLoc, projectFile);
+
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(htmlOutputFile));
+            writer.write(htmlOutputString);
+            writer.close();
+            Desktop.getDesktop().browse(htmlOutputFile.toURI());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         projectsManager.closeProject();
 
