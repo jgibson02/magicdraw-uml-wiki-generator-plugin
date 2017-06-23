@@ -19,7 +19,8 @@ public class GenerateWikiPageTest extends TestCase {
      * Give wikiPageGen a test file path and test project and give badGen a
      * bad fileLoc
      */
-    public void setUp() {
+    public void setUp() throws Exception {
+        super.setUp();
         wikiPageGen = new GenerateWikiPage("" +
                 "test\\resources\\imgs", new File
                 ("test\\resources\\testProject.mzip"));
