@@ -12,18 +12,18 @@ import java.nio.file.FileSystemNotFoundException;
  */
 public class GenerateWikiPageTest extends TestCase {
 
-    private GenerateWikiPage wikiPageGen; // Ideal senario
-    private GenerateWikiPage badGen; // Inccorect file path
+    private WikiPageGenerator wikiPageGen; // Ideal senario
+    private WikiPageGenerator badGen; // Inccorect file path
 
     /**
      * Give wikiPageGen a test file path and test project and give badGen a
      * bad fileLoc
      */
     public void setUp() {
-        wikiPageGen = new GenerateWikiPage("" +
+        wikiPageGen = new WikiPageGenerator("" +
                 "test\\resources\\imgs", new File
                 ("test\\resources\\testProject.mzip"));
-        badGen = new GenerateWikiPage("badfilepath", new File
+        badGen = new WikiPageGenerator("badfilepath", new File
                 ("test\\resources\\testProject.mzip"));
     }
 
