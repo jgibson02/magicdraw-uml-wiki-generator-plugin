@@ -79,7 +79,7 @@ public class UMLWikiGenGUI extends JFrame {
         panel.add(fileNameLabel);
         panel.add(Box.createVerticalStrut(10));
         panel.add(submitButton);
-        panel.add(Box.createVerticalStrut(10));
+        panel.add(Box.createVerticalStrut(30));
         panel.add(new JScrollPane(textComponent));
 
         add(panel);
