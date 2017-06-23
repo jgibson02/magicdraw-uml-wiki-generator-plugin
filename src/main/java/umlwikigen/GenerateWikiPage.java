@@ -1,6 +1,7 @@
 package main.java.umlwikigen;
 
 import java.io.File;
+import java.nio.file.FileSystemNotFoundException;
 
 /**
  * Author: Kareem Abdol-Hamid kkabdolh
@@ -18,7 +19,7 @@ public class GenerateWikiPage {
         this.imgDest = imgDest;
     }
 
-    boolean generate() {
+    String generateWikiString() {
         File dir = new File(imgDest);
         File[] dirList = dir.listFiles();
         if (dirList != null) {
@@ -28,12 +29,8 @@ public class GenerateWikiPage {
             wikiPage += "</body></html>";
         }
         else {
-            return false;
+            throw new FileSystemNotFoundException();
         }
-        return true;
-    }
-
-    String getWikiPage() {
         return wikiPage;
     }
 }
