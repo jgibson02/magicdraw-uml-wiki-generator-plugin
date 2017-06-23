@@ -10,15 +10,15 @@ import java.nio.file.FileSystemNotFoundException;
  * Author: Kareem Abdol-Hamid kkabdolh
  * Version: 6/23/2017
  */
-public class GenerateWikiPageTest extends TestCase {
+public class WikiPageGeneratorTest extends TestCase {
 
-    private GenerateWikiPage wikiPageGen; // Ideal senario
-    private GenerateWikiPage badGen; // Inccorect file path
+    private WikiPageGenerator wikiPageGen; // Ideal scenario
+    private WikiPageGenerator badGen; // Incorrect file path
 
     /**
-     * Give wikiPageGen a test file path and test project and give badGen a
-     * bad fileLoc
+     * Give wikiPageGen a test file path and test project and give badGen a bad fileLoc
      */
+<<<<<<< HEAD:test/main/java/umlwikigen/GenerateWikiPageTest.java
     public void setUp() throws Exception {
         super.setUp();
         wikiPageGen = new GenerateWikiPage("" +
@@ -26,6 +26,11 @@ public class GenerateWikiPageTest extends TestCase {
                 ("test\\resources\\testProject.mzip"));
         badGen = new GenerateWikiPage("badfilepath", new File
                 ("test\\resources\\testProject.mzip"));
+=======
+    public void setUp() {
+        wikiPageGen = new WikiPageGenerator();
+        badGen = new WikiPageGenerator();
+>>>>>>> 0fa16abdd5de6627d68639628229dc14d90c4e60:test/main/java/umlwikigen/WikiPageGeneratorTest.java
     }
 
     /**
@@ -37,11 +42,14 @@ public class GenerateWikiPageTest extends TestCase {
                 "src=\"C:\\Users\\kkabdolh\\Documents\\UMLWikiGenerator\\test\\resources\\imgs\\img1.jpg/><br/><img src=\"C:\\Users\\kkabdolh\\Documents\\UMLWikiGenerator\\test\\resources\\imgs\\img2.jpg/><br/></body></html>";
         Exception thrown = null;
         try {
-            badGen.generateWikiString();
+            badGen.generateWikiString("badfilepath", new File
+                    ("test\\resources\\testProject.mzip"));
         } catch (FileSystemNotFoundException e){
             thrown = e;
         }
         assertNotNull(thrown);
-        assertTrue(wikiPageEqual.equals(wikiPageGen.generateWikiString()));
+        assertTrue(wikiPageEqual.equals(wikiPageGen.generateWikiString("" +
+                "test\\resources\\imgs", new File
+                ("test\\resources\\testProject.mzip"))));
     }
 }
