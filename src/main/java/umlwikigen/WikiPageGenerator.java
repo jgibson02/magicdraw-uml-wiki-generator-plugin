@@ -13,7 +13,7 @@ public class WikiPageGenerator {
     String generateWikiString(String imgDest, File project) {
         String projectName = project.getName().substring(0, project.getName()
                 .length() - FILE_EXTENSION);
-        String wikiPage = "<html><title>"+projectName+"</title><body>";;
+        String wikiPage = "<html><title>"+projectName+"</title><body>";
         File dir = new File(imgDest);
         File[] dirList = dir.listFiles();
         if (dirList != null) {

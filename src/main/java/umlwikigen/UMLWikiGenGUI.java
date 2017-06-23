@@ -1,8 +1,11 @@
 package main.java.umlwikigen;
 
+import main.java.umlwikigen.messageconsole.MessageConsole;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -26,6 +29,10 @@ public class UMLWikiGenGUI extends JFrame {
         JLabel fileNameLabel = new JLabel("No file selected");
         JButton submitButton = new JButton("Submit");
         JFileChooser fileChooser = new JFileChooser();
+        JTextArea textComponent = new JTextArea();
+        MessageConsole mc = new MessageConsole(textComponent);
+        mc.redirectOut();
+        mc.setMessageLines(100);
         final MagicDrawUMLImageExtractor imageExtractor = new MagicDrawUMLImageExtractor(currentlySelectedFile);
 
         submitButton.setEnabled(false); // Set submit button to disabled by default, enables when user selects file
@@ -72,10 +79,12 @@ public class UMLWikiGenGUI extends JFrame {
         panel.add(fileNameLabel);
         panel.add(Box.createVerticalStrut(10));
         panel.add(submitButton);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(new JScrollPane(textComponent));
 
         add(panel);
         setVisible(true);
-        pack();
+        setSize(900, 500);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
