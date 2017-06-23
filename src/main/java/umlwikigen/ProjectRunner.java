@@ -1,4 +1,4 @@
-package umlwikigen;
+package main.java.umlwikigen;
 
 /**
  * Created by jhgibso1 on 6/22/2017.

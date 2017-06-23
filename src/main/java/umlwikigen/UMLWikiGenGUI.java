@@ -1,4 +1,4 @@
-package umlwikigen;
+package main.java.umlwikigen;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -6,7 +6,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.FileFilter;
 
 /**
  * Created by jhgibso1 on 6/22/2017.

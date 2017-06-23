@@ -1,4 +1,4 @@
-package umlwikigen;
+package main.java.umlwikigen;
 
 import java.io.File;
 
@@ -19,6 +19,7 @@ public class GenerateWikiPage {
     private void generate() {
         File dir = new File(imgDest);
         File[] dirList = dir.listFiles();
+
         //wikiPage += "<img src=\"" + img.getAbsoluteFile() + "/><br/>";
     }
 }

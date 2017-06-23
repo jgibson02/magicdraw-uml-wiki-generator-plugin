@@ -1,3 +1,5 @@
+package main.java.umlwikigen;
+
 import junit.framework.TestCase;
 
 /**

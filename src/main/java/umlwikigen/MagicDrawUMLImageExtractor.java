@@ -1,4 +1,4 @@
-package umlwikigen;
+package main.java.umlwikigen;
 
 import com.nomagic.magicdraw.commandline.CommandLine;
 import com.nomagic.magicdraw.core.Application;

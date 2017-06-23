@@ -1,4 +1,4 @@
-package umlwikigen;
+package main.java.umlwikigen;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,7 +8,6 @@ import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
 import java.net.URL;
-import java.util.Scanner;
 
 /**
  * Author: Kareem Abdol-Hamid kkabdolh
@@ -16,14 +15,7 @@ import java.util.Scanner;
  */
 public class SharePointRest {
 
-    /**
-     * I have no clue what's happening here, I'm just copying stuff and
-     * hoping for thebest
-     * @param args
-     * @throws Exception
-     */
-    public static void main(String[] args) throws Exception {
-
+    public SharePointRest() {
         String urlStr = "https://larced.spstg.jsc.nasa.gov/sites/EDM/seemb/sandbox";
         String domain = ""; // May also be referred as realm
         String userName = "kkabdolh";
@@ -31,7 +23,13 @@ public class SharePointRest {
         System.out.print("HELLO>!");
         String password = "password";//scan.next();
 
-        String responseText = getAuthenticatedResponse(urlStr, domain, userName, password);
+        String responseText = null;
+
+        try {
+            responseText = getAuthenticatedResponse(urlStr, domain, userName, password);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         System.out.println("response: " + responseText);
     }
