@@ -66,7 +66,7 @@ public class UMLWikiGenGUI extends JFrame {
         });
         submitButton.addActionListener((ActionEvent e) -> {
             String[] defaultArgs = {
-                    //"-verbose",
+                    "-verbose",
                     "-Xmx1200M",
                     "-Xss1024K",
                     "-DLOCALCONFIG=true",

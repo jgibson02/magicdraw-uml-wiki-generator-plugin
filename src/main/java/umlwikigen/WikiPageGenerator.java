@@ -36,7 +36,7 @@ public class WikiPageGenerator {
         if (dirList != null) {
             for (File img : dirList) {
                 String diagramName = removeFileExtension(img);
-                wikiPageHead += "var "+diagramName+" = svgPanZoom('#"+diagramName+"');";
+                wikiPageHead += "var "+diagramName+" = svgPanZoom('#"+diagramName+"', {zoomEnabled: true, controlIconsEnabled: true, fit: 1, center: 1});";
 
                 String output = "";
                 // Get string representation of SVG file's DOM
