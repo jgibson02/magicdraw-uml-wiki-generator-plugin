@@ -4,14 +4,12 @@ import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.FileSystemNotFoundException;
 
@@ -23,7 +21,7 @@ public class WikiPageGenerator {
     static String generateWikiString(String imgDest, File project) {
         String wikiPageHead =
                     "<title>"+removeFileExtension(project)+"</title>" +
-                    "<script src=\"http://ariutta.github.io/svg-pan-zoom/dist/svg-pan-zoom.min.js\"></script>" +
+                    "<script src=\"https://ariutta.github.io/svg-pan-zoom/dist/svg-pan-zoom.min.js\"></script>" +
                     /*"<style>" +
                         "svg {" +
                             "max-width: 75vw;" +
@@ -70,4 +68,5 @@ public class WikiPageGenerator {
         int extensionLength = fileName.substring(fileName.indexOf(".")).length();
         return f.getName().substring(0, f.getName().length() - extensionLength);
     }
+
 }
