@@ -59,6 +59,7 @@ public class WikiUpdateParticipant implements SaveParticipant {
                         isInDiagrams = true;
                 }
                 if (isInDiagrams == false)
+                    Application.getInstance().getGUILog().log("Deleting " + f.getName(), true);
                     f.delete();
             }
 
@@ -92,11 +93,15 @@ public class WikiUpdateParticipant implements SaveParticipant {
     private void exportDiagrams(Collection<DiagramPresentationElement> diagrams, String fileLoc) {
         double count = 0;
         int total = diagrams.size();
-        if (total > 0)
+        if (total == 0) {
+            System.out.println("Nothing to export.");
+            Application.getInstance().getGUILog().log("Nothing to export.", true);
+        } else if (total > 0) {
             System.out.println("Diagrams to export: " + total);
             System.out.println("0% Complete");
             Application.getInstance().getGUILog().log("Diagrams to export: " + total, true);
             Application.getInstance().getGUILog().log("0% Complete", true);
+        }
         for (DiagramPresentationElement dpe : diagrams) {
             if (dpe != null) {
                 File img = new File(fileLoc + '\\' + dpe.getDiagram().getName() + ".svg");
