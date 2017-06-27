@@ -162,32 +162,6 @@
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="MyPlugin1Test" type="JUnit" factoryName="JUnit">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <module name="All Plugins" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" value="" />
-      <option name="PACKAGE_NAME" value="wikigeneratorplugin" />
-      <option name="MAIN_CLASS_NAME" value="wikigeneratorplugin.MyPlugin1Test" />
-      <option name="METHOD_NAME" value="" />
-      <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" value="-Xmx1200M -Xss1024K -XX:PermSize=60M -XX:MaxPermSize=200M -DLOCALCONFIG=true -Dinstall.root=${MAGIC_DRAW_INSTALL_DIRECTORY} -Dmd.plugins.dir=${MAGIC_DRAW_INSTALL_DIRECTORY}/plugins;.." />
-      <option name="PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="file://$MODULE_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="singleModule" />
-      </option>
-      <envs />
-      <patterns />
-      <RunnerSettings RunnerId="JProfiler">
-        <option name="WINDOW" value="false" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method />
-    </configuration>
     <configuration default="false" name="MagicDraw with all plugins" type="Application" factoryName="Application">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <option name="MAIN_CLASS_NAME" value="com.nomagic.magicdraw.Main" />
@@ -214,11 +188,45 @@
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
+    <configuration default="false" name="MyPlugin1Test" type="JUnit" factoryName="JUnit">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="All Plugins" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" value="" />
+      <option name="PACKAGE_NAME" value="wikigeneratorplugin" />
+      <option name="MAIN_CLASS_NAME" value="wikigeneratorplugin.MyPlugin1Test" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-Xmx1200M -Xss1024K -XX:PermSize=60M -XX:MaxPermSize=200M -DLOCALCONFIG=true -Dinstall.root=${MAGIC_DRAW_INSTALL_DIRECTORY} -Dmd.plugins.dir=${MAGIC_DRAW_INSTALL_DIRECTORY}/plugins;.." />
+      <option name="PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="file://$MODULE_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <envs />
+      <patterns />
+      <RunnerSettings RunnerId="JProfiler">
+        <option name="WINDOW" value="false" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
   </component>
   <component name="libraryTable">
+    <library name="java">
+      <CLASSES />
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://$USER_HOME$/Downloads/java-sharepoint-library-master.zip!/java-sharepoint-library-master/src/main/java" />
+        <root url="jar://$USER_HOME$/Downloads/java-sharepoint-library-master.zip!/java-sharepoint-library-master/src/test/java" />
+      </SOURCES>
+    </library>
     <library name="MagicDraw">
       <CLASSES>
         <root url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/lib" />
@@ -228,6 +236,13 @@
       </JAVADOC>
       <SOURCES />
       <jarDirectory url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/lib" recursive="true" />
+    </library>
+    <library name="SharePoint">
+      <CLASSES />
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://$USER_HOME$/Downloads/jtip-sharepoint-src.zip!/SharePointTest/src" />
+      </SOURCES>
     </library>
   </component>
 </project>

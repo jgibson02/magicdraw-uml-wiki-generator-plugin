@@ -6,5 +6,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="WikiGeneratorPlugin" exported="" />
+    <orderEntry type="library" name="java" level="project" />
   </component>
 </module>
