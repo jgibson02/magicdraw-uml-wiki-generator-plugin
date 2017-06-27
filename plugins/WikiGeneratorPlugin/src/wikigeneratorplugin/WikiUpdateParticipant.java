@@ -91,7 +91,7 @@ public class WikiUpdateParticipant implements SaveParticipant {
     }
 
     private void exportDiagrams(Collection<DiagramPresentationElement> diagrams, String fileLoc) {
-        double count = 0;
+        int count = 0;
         int total = diagrams.size();
         if (total == 0) {
             System.out.println("Nothing to export.");
@@ -104,6 +104,7 @@ public class WikiUpdateParticipant implements SaveParticipant {
         }
         for (DiagramPresentationElement dpe : diagrams) {
             if (dpe != null) {
+                count++;
                 File img = new File(fileLoc + '\\' + dpe.getDiagram().getName() + ".svg");
                 Application.getInstance().getGUILog().log("Exporting " + dpe.getDiagram().getName() + ".svg (" + count + "/" + total + ")", true);
                 System.out.println("Exporting " + dpe.getDiagram().getName() + ".svg (" + count + "/" + total + ")");
@@ -113,8 +114,8 @@ public class WikiUpdateParticipant implements SaveParticipant {
                     e.printStackTrace();
                 }
             }
-            count++;
-            Application.getInstance().getGUILog().log((int) Math.round(((count / (double) total) * 100)) + "% " + "Complete", true);
+
+            Application.getInstance().getGUILog().log((int) Math.round((((double) count / (double) total) * 100)) + "% Complete", true);
             System.out.println((int) Math.round(((count / (double) total) * 100)) + "% " + "Complete");
         }
     }
