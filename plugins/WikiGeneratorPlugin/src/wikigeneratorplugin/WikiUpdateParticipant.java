@@ -7,7 +7,6 @@ import com.nomagic.magicdraw.export.image.ImageExporter;
 import com.nomagic.magicdraw.uml.symbols.DiagramPresentationElement;
 
 import java.io.File;
-import java.io.StringReader;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -39,11 +38,27 @@ public class WikiUpdateParticipant implements SaveParticipant {
     @Override
     public void doAfterSave(Project project, ProjectDescriptor projectDescriptor) {
         Collection<DiagramPresentationElement> diagrams = project.getDiagrams();
-        for (DiagramPresentationElement dpe : diagrams) {
+        for (DiagramPresentationElement dpe : diagrams)
             if (new File(fileLoc + '\\' + dpe.getDiagram().getName() + ".svg").exists() == false)
                 dirtyDiagrams.add(dpe);
+        makeNewDirectory(fileLoc); // Create project_diagrams folder if it isn't already created
+
+        // Iterate over every .svg in project's folder, check if it is in the list of project diagrams, and if not: delete
+        File siteAssetsDirectory = new File(fileLoc);
+        File[] existentFiles = siteAssetsDirectory.listFiles((dir, name) -> {
+                return name.toLowerCase().endsWith(".svg");
+        });
+        for (File f : existentFiles) {
+            String diagramNameFromFile = f.getName().replace(".svg", "");
+            boolean isInDiagrams = false;
+            for (DiagramPresentationElement dpe : diagrams) {
+                if (dpe.getDiagram().getName().equals(diagramNameFromFile))
+                    isInDiagrams = true;
+            }
+            if (isInDiagrams == false)
+                f.delete();
         }
-        makeNewDirectory(fileLoc);
+
         exportDiagrams(dirtyDiagrams, fileLoc);
         dirtyDiagrams.clear();
     }
