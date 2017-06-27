@@ -7,11 +7,9 @@ import com.nomagic.magicdraw.uml.ExtendedPropertyNames;
 import com.nomagic.magicdraw.uml.symbols.DiagramListenerAdapter;
 import com.nomagic.magicdraw.uml.symbols.DiagramPresentationElement;
 import com.nomagic.magicdraw.uml.symbols.shapes.DiagramFrameView;
-import com.nomagic.runtime.ApplicationExitedException;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.util.HashSet;
 
 /**
