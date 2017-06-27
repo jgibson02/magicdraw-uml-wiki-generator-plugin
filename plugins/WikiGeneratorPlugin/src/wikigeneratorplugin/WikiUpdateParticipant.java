@@ -1,5 +1,7 @@
 package wikigeneratorplugin;
 
+import com.nomagic.magicdraw.core.Application;
+import com.nomagic.magicdraw.core.GUILog;
 import com.nomagic.magicdraw.core.Project;
 import com.nomagic.magicdraw.core.SaveParticipant;
 import com.nomagic.magicdraw.core.project.ProjectDescriptor;
@@ -37,30 +39,32 @@ public class WikiUpdateParticipant implements SaveParticipant {
 
     @Override
     public void doAfterSave(Project project, ProjectDescriptor projectDescriptor) {
-        Collection<DiagramPresentationElement> diagrams = project.getDiagrams();
-        for (DiagramPresentationElement dpe : diagrams)
-            if (new File(fileLoc + '\\' + dpe.getDiagram().getName() + ".svg").exists() == false)
-                dirtyDiagrams.add(dpe);
-        makeNewDirectory(fileLoc); // Create project_diagrams folder if it isn't already created
+        if (Application.getInstance().getGUILog().showQuestion("Would you like to update the wiki page on SharePoint?")) {
+            Collection<DiagramPresentationElement> diagrams = project.getDiagrams();
+            for (DiagramPresentationElement dpe : diagrams)
+                if (new File(fileLoc + '\\' + dpe.getDiagram().getName() + ".svg").exists() == false)
+                    dirtyDiagrams.add(dpe);
+            makeNewDirectory(fileLoc); // Create project_diagrams folder if it isn't already created
 
-        // Iterate over every .svg in project's folder, check if it is in the list of project diagrams, and if not: delete
-        File siteAssetsDirectory = new File(fileLoc);
-        File[] existentFiles = siteAssetsDirectory.listFiles((dir, name) -> {
+            // Iterate over every .svg in project's folder, check if it is in the list of project diagrams, and if not: delete
+            File siteAssetsDirectory = new File(fileLoc);
+            File[] existentFiles = siteAssetsDirectory.listFiles((dir, name) -> {
                 return name.toLowerCase().endsWith(".svg");
-        });
-        for (File f : existentFiles) {
-            String diagramNameFromFile = f.getName().replace(".svg", "");
-            boolean isInDiagrams = false;
-            for (DiagramPresentationElement dpe : diagrams) {
-                if (dpe.getDiagram().getName().equals(diagramNameFromFile))
-                    isInDiagrams = true;
+            });
+            for (File f : existentFiles) {
+                String diagramNameFromFile = f.getName().replace(".svg", "");
+                boolean isInDiagrams = false;
+                for (DiagramPresentationElement dpe : diagrams) {
+                    if (dpe.getDiagram().getName().equals(diagramNameFromFile))
+                        isInDiagrams = true;
+                }
+                if (isInDiagrams == false)
+                    f.delete();
             }
-            if (isInDiagrams == false)
-                f.delete();
-        }
 
-        exportDiagrams(dirtyDiagrams, fileLoc);
-        dirtyDiagrams.clear();
+            exportDiagrams(dirtyDiagrams, fileLoc);
+            dirtyDiagrams.clear();
+        }
     }
 
     /**
@@ -87,14 +91,17 @@ public class WikiUpdateParticipant implements SaveParticipant {
 
     private void exportDiagrams(Collection<DiagramPresentationElement> diagrams, String fileLoc) {
         double count = 0;
-        double total = (double) diagrams.size();
+        int total = diagrams.size();
         if (total > 0)
+            System.out.println("Diagrams to export: " + total);
             System.out.println("0% Complete");
+            Application.getInstance().getGUILog().log("Diagrams to export: " + total, true);
+            Application.getInstance().getGUILog().log("0% Complete", true);
         for (DiagramPresentationElement dpe : diagrams) {
             if (dpe != null) {
-                File img = new File(fileLoc + '\\' + dpe.getDiagram()
-                        .getName() + ".svg");
-                System.out.println("Exporting " + dpe.getDiagram().getName());
+                File img = new File(fileLoc + '\\' + dpe.getDiagram().getName() + ".svg");
+                Application.getInstance().getGUILog().log("Exporting " + dpe.getDiagram().getName() + ".svg (" + count + "/" + total + ")", true);
+                System.out.println("Exporting " + dpe.getDiagram().getName() + ".svg (" + count + "/" + total + ")");
                 try {
                     ImageExporter.export(dpe, ImageExporter.SVG, img);
                 } catch (Exception e) {
@@ -102,7 +109,8 @@ public class WikiUpdateParticipant implements SaveParticipant {
                 }
             }
             count++;
-            System.out.println((int) Math.round(((count / total) * 100)) + "% " + "Complete");
+            Application.getInstance().getGUILog().log((int) Math.round(((count / (double) total) * 100)) + "% " + "Complete", true);
+            System.out.println((int) Math.round(((count / (double) total) * 100)) + "% " + "Complete");
         }
     }
 
