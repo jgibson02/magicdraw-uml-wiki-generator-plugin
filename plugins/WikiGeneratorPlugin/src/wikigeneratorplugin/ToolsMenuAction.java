@@ -4,7 +4,6 @@ import com.nomagic.actions.NMAction;
 import com.nomagic.magicdraw.actions.MDAction;
 import com.nomagic.magicdraw.core.Application;
 
-import javax.annotation.CheckForNull;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -13,19 +12,19 @@ import java.awt.event.KeyEvent;
  * Author: Kareem Abdol-Hamid kkabdolh
  * Version: 6/29/2017
  */
-public class PluginMenuAction extends MDAction {
+public class ToolsMenuAction extends MDAction {
 
     /**
      * Creates action with name "ExampleAction", and with key stroke E +CTRL+SHIFT
      */
-    public PluginMenuAction()
+    public ToolsMenuAction()
     {
         super( "sppluginoptions", "SharePoint Plugin Options",  KeyStroke.getKeyStroke( KeyEvent.VK_E, NMAction.MENU_SHORTCUT_MASK+KeyEvent.SHIFT_MASK), null);
     }
 
     /**
      */
-    public PluginMenuAction(String id, String name, KeyStroke stroke, String group)
+    public ToolsMenuAction(String id, String name, KeyStroke stroke, String group)
     {
         super(id, name, stroke, group);
     }
@@ -38,5 +37,6 @@ public class PluginMenuAction extends MDAction {
     public void actionPerformed(ActionEvent e)
     {
         Application.getInstance().getGUILog().showError("ERror: It works");
+        new ConfigurationPopupMenu();
     }
 }

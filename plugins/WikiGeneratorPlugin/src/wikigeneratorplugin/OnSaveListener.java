@@ -16,13 +16,13 @@ import java.util.HashSet;
  * Author: Kareem Abdol-Hamid kkabdolh
  * Version: 6/27/2017
  */
-public class WikiUpdateParticipant implements SaveParticipant {
+public class OnSaveListener implements SaveParticipant {
 
     private HashSet<DiagramPresentationElement> dirtyDiagrams;
     private String fileLoc;
 
-    WikiUpdateParticipant(HashSet<DiagramPresentationElement> dirtyDiagrams,
-                          String fileLoc) {
+    OnSaveListener(HashSet<DiagramPresentationElement> dirtyDiagrams,
+                   String fileLoc) {
         this.dirtyDiagrams = dirtyDiagrams;
         this.fileLoc = fileLoc;
     }
@@ -34,7 +34,7 @@ public class WikiUpdateParticipant implements SaveParticipant {
 
     @Override
     public void doBeforeSave(Project project, ProjectDescriptor projectDescriptor) {
-        // Do nothing
+
     }
 
     @Override

@@ -1,0 +1,7 @@
+<xml version="420">
+    <plugin version = "1.0">
+        <settings>
+            include "";
+        </settings>
+    </plugin>
+</xml>

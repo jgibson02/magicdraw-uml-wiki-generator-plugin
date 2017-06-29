@@ -16,13 +16,13 @@ import java.util.HashSet;
  * Author: Kareem Abdol-Hamid kkabdolh
  * Version: 6/27/2017
  */
-public class WikiGenProjectListener implements ProjectEventListener {
+public class ProjectListener implements ProjectEventListener {
 
     private static final String DESTINATION = "s:\\SiteAssets\\";
     private HashSet<DiagramPresentationElement> dirtyDiagrams;
     private String fileLoc;
 
-    WikiGenProjectListener(HashSet<DiagramPresentationElement> dirtyDiagrams) {
+    ProjectListener(HashSet<DiagramPresentationElement> dirtyDiagrams) {
         this.dirtyDiagrams = dirtyDiagrams;
     }
 
@@ -30,7 +30,7 @@ public class WikiGenProjectListener implements ProjectEventListener {
     public void projectOpened(final Project project) {
         fileLoc = DESTINATION + project.getName() + "_DIAGRAMS";
         Application.getInstance().addSaveParticipant(new
-                WikiUpdateParticipant(dirtyDiagrams, fileLoc));
+                OnSaveListener(dirtyDiagrams, fileLoc));
         DiagramListenerAdapter adapter = new DiagramListenerAdapter(new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
