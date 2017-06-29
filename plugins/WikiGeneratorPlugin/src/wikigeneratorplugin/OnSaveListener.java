@@ -7,8 +7,13 @@ import com.nomagic.magicdraw.core.SaveParticipant;
 import com.nomagic.magicdraw.core.project.ProjectDescriptor;
 import com.nomagic.magicdraw.export.image.ImageExporter;
 import com.nomagic.magicdraw.uml.symbols.DiagramPresentationElement;
+import com.sun.beans.decoder.DocumentHandler;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -34,7 +39,26 @@ public class OnSaveListener implements SaveParticipant {
 
     @Override
     public void doBeforeSave(Project project, ProjectDescriptor projectDescriptor) {
-
+        Application.getInstance().getGUILog().log("test1");
+        System.out.println("Working Directory = " +
+                System.getProperty("user.dir"));
+        try {
+            //TODO: This file location may cause issues in the future,
+            // lookout for relative path
+            File fXmlFile = new File
+                    ("../WikiGeneratorPlugin/resources/pluginconfig.xml");
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(fXmlFile);
+            doc.getDocumentElement().normalize();
+            Application.getInstance().getGUILog().log("Root element :" + doc
+                    .getDocumentElement()
+                    .getNodeName());
+            Application.getInstance().getGUILog().log("test");
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            e.printStackTrace();
+            Application.getInstance().getGUILog().showError("Error Occurred");
+        }
     }
 
     @Override
@@ -48,9 +72,7 @@ public class OnSaveListener implements SaveParticipant {
 
             // Iterate over every .svg in project's folder, check if it is in the list of project diagrams, and if not: delete
             File siteAssetsDirectory = new File(fileLoc);
-            File[] existentFiles = siteAssetsDirectory.listFiles((dir, name) -> {
-                return name.toLowerCase().endsWith(".svg");
-            });
+            File[] existentFiles = siteAssetsDirectory.listFiles((dir, name) -> name.toLowerCase().endsWith(".svg"));
             for (File f : existentFiles) {
                 String diagramNameFromFile = f.getName().replace(".svg", "");
                 boolean isInDiagrams = false;
