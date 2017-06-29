@@ -74,12 +74,10 @@ public class WikiUpdateParticipant implements SaveParticipant {
      * @param fileLoc location of folder being saved to, path is accessible
      * @return true if the project exists already or was successfully created
      */
-    private boolean makeNewDirectory(String fileLoc) {
+    private void makeNewDirectory(String fileLoc) {
         File theDir = new File(fileLoc);
-        boolean result = true;
         // if the directory does not exist, create it
         if (theDir.exists() == false) {
-            result = false;
             try {
                 createDrive(fileLoc);
                 theDir.mkdir();
@@ -87,7 +85,6 @@ public class WikiUpdateParticipant implements SaveParticipant {
                 e.printStackTrace();
             }
         }
-        return result;
     }
 
     private void exportDiagrams(Collection<DiagramPresentationElement> diagrams, String fileLoc) {
