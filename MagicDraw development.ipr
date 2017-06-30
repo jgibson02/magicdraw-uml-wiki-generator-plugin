@@ -219,13 +219,12 @@
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
   </component>
   <component name="libraryTable">
-    <library name="java">
-      <CLASSES />
+    <library name="javax.json-api-1.0">
+      <CLASSES>
+        <root url="jar://$USER_HOME$/Downloads/javax.json-api-1.0.jar!/" />
+      </CLASSES>
       <JAVADOC />
-      <SOURCES>
-        <root url="jar://$USER_HOME$/Downloads/java-sharepoint-library-master.zip!/java-sharepoint-library-master/src/main/java" />
-        <root url="jar://$USER_HOME$/Downloads/java-sharepoint-library-master.zip!/java-sharepoint-library-master/src/test/java" />
-      </SOURCES>
+      <SOURCES />
     </library>
     <library name="MagicDraw">
       <CLASSES>
