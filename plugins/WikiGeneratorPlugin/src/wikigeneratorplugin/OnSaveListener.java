@@ -47,11 +47,7 @@ public class OnSaveListener implements SaveParticipant {
     @Override
     public void doBeforeSave(Project project, ProjectDescriptor projectDescriptor) {
         includedDiagrams.clear();
-        System.out.println("Working Directory = " +
-                System.getProperty("user.dir"));
         try {
-            //TODO: This file location may cause issues in the future,
-            // lookout for relative path
             File fXmlFile = new File
                     ("resources/pluginconfig.xml");
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -79,14 +75,11 @@ public class OnSaveListener implements SaveParticipant {
             Collection<DiagramPresentationElement> diagrams = project.getDiagrams();
             System.out.println(diagrams.toString());
             for (DiagramPresentationElement dpe : diagrams)
-                if (new File(fileLoc + '\\' + dpe.getDiagram().getName() + "" +
-                        ".svg").exists() == false && includedDiagrams.contains(dpe.getDiagram().getID())) {
-                    Application.getInstance().getGUILog().log("Diagram ID: "
-                            + dpe.getDiagram().getID());
+                if (!new File(fileLoc + '\\' + dpe.getDiagram().getName() + "" +
+                        ".svg").exists() && includedDiagrams.contains(dpe.getDiagram().getID())) {
                     dirtyDiagrams.add(dpe);
                 }
             makeNewDirectory(fileLoc); // Create project_diagrams folder if it isn't already created
-
             // Iterate over every .svg in project's folder, check if it is in the list of project diagrams, and if not: delete
             File siteAssetsDirectory = new File(fileLoc);
             File[] existentFiles = siteAssetsDirectory.listFiles((dir, name) -> name.toLowerCase().endsWith(".svg"));
@@ -107,6 +100,7 @@ public class OnSaveListener implements SaveParticipant {
 
                 if (!isInDiagrams || !included) {
                     Application.getInstance().getGUILog().log("Deleting " + f.getName());
+                    System.out.print("Deleting " + f.getName());
                     f.delete();
                 }
             }
@@ -116,23 +110,10 @@ public class OnSaveListener implements SaveParticipant {
         }
     }
 
-    /**
-     * Creates a diagram for a given project
-     *
-     * @param fileLoc location of folder being saved to, path is accessible
-     */
-    private void makeNewDirectory(String fileLoc) {
-        File theDir = new File(fileLoc);
-        // if the directory does not exist, create it
-        if (theDir.exists() == false) {
-            try {
-                createDrive(fileLoc);
-                theDir.mkdir();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
+    //===================================================
+    // Private Methods
+    //===================================================
+
 
     private void exportDiagrams(Collection<DiagramPresentationElement> diagrams, String fileLoc) {
         int count = 0;
@@ -165,6 +146,24 @@ public class OnSaveListener implements SaveParticipant {
     }
 
     /**
+     * Creates a diagram for a given project
+     *
+     * @param fileLoc location of folder being saved to, path is accessible
+     */
+    private void makeNewDirectory(String fileLoc) {
+        File theDir = new File(fileLoc);
+        // if the directory does not exist, create it
+        if (!theDir.exists()) {
+            try {
+                createDrive(fileLoc);
+                theDir.mkdir();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
      * Creates a network drive connecting sandbox to computer.
      * TODO: Add user input for networkLocation
      *
@@ -172,7 +171,7 @@ public class OnSaveListener implements SaveParticipant {
      *                two characters and proper path to file
      */
     private void createDrive(String fileLoc) {
-        createDrive(fileLoc, " https:\\\\larced.spstg.jsc.nasa.gov\\sites\\EDM\\seemb\\sandbox");
+        createDrive(fileLoc, "https:\\\\larced.spstg.jsc.nasa.gov\\sites\\EDM\\seemb\\sandbox");
     }
 
     /**
