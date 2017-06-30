@@ -77,7 +77,7 @@ public class OnSaveListener implements SaveParticipant {
             Collection<DiagramPresentationElement> diagrams = project.getDiagrams();
             for (DiagramPresentationElement dpe : diagrams)
                 if (new File(fileLoc + '\\' + dpe.getDiagram().getName() + "" +
-                        ".svg").exists() == false) {
+                        ".svg").exists() == false && includedDiagrams.contains(dpe.getDiagram().getID())) {
                     Application.getInstance().getGUILog().log("Diagram ID: "
                             + dpe.getDiagram().getID());
                     dirtyDiagrams.add(dpe);
@@ -136,7 +136,7 @@ public class OnSaveListener implements SaveParticipant {
             Application.getInstance().getGUILog().log("0% Complete", true);
         }
         for (DiagramPresentationElement dpe : diagrams) {
-            if (dpe != null ) { //&& includedDiagrams.contains(dpe.getDiagram().getID())
+            if (dpe != null) {
                 count++;
                 File img = new File(fileLoc + '\\' + dpe.getDiagram().getName() + ".svg");
                 Application.getInstance().getGUILog().log("Exporting " + dpe.getDiagram().getName() + ".svg (" + count + "/" + total + ")", true);
