@@ -17,7 +17,7 @@ public class ToolsMenuAction extends MDAction {
     /**
      * Creates action with name "ExampleAction", and with key stroke E +CTRL+SHIFT
      */
-    public ToolsMenuAction()
+    ToolsMenuAction()
     {
         super( "sppluginoptions", "SharePoint Plugin Options",  KeyStroke.getKeyStroke( KeyEvent.VK_E, NMAction.MENU_SHORTCUT_MASK+KeyEvent.SHIFT_MASK), null);
     }

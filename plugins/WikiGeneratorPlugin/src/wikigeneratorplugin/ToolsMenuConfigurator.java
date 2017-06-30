@@ -33,7 +33,7 @@ public class ToolsMenuConfigurator implements AMConfigurator {
     public void configure(ActionsManager manager)
     {
         // searching for Help action category
-        ActionsCategory category = (ActionsCategory)manager.getActionFor
+        ActionsCategory category = (ActionsCategory) manager.getActionFor
                 (ActionsID.TOOLS);
         if( category != null)
         {

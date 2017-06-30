@@ -20,7 +20,6 @@ public class ProjectListener implements ProjectEventListener {
 
     private static final String DESTINATION = "s:\\SiteAssets\\";
     private HashSet<DiagramPresentationElement> dirtyDiagrams;
-    private String fileLoc;
 
     ProjectListener(HashSet<DiagramPresentationElement> dirtyDiagrams) {
         this.dirtyDiagrams = dirtyDiagrams;
@@ -28,7 +27,7 @@ public class ProjectListener implements ProjectEventListener {
 
     @Override
     public void projectOpened(final Project project) {
-        fileLoc = DESTINATION + project.getName() + "_DIAGRAMS";
+        String fileLoc = DESTINATION + project.getName() + "_DIAGRAMS";
         Application.getInstance().addSaveParticipant(new
                 OnSaveListener(dirtyDiagrams, fileLoc));
         DiagramListenerAdapter adapter = new DiagramListenerAdapter(new PropertyChangeListener() {

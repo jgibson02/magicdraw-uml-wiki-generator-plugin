@@ -9,6 +9,9 @@ import com.nomagic.magicdraw.export.image.ImageExporter;
 import com.nomagic.magicdraw.uml.symbols.DiagramPresentationElement;
 import com.sun.beans.decoder.DocumentHandler;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.*;
@@ -24,12 +27,14 @@ import java.util.HashSet;
 public class OnSaveListener implements SaveParticipant {
 
     private HashSet<DiagramPresentationElement> dirtyDiagrams;
+    private HashSet<String> includedDiagrams;
     private String fileLoc;
 
     OnSaveListener(HashSet<DiagramPresentationElement> dirtyDiagrams,
                    String fileLoc) {
         this.dirtyDiagrams = dirtyDiagrams;
         this.fileLoc = fileLoc;
+        this.includedDiagrams = new HashSet<String>();
     }
 
     @Override
@@ -51,11 +56,16 @@ public class OnSaveListener implements SaveParticipant {
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(fXmlFile);
             doc.getDocumentElement().normalize();
-            Application.getInstance().getGUILog().log("Root element :" + doc
-                    .getDocumentElement()
-                    .getNodeName());
-            Application.getInstance().getGUILog().log("test");
-        } catch (ParserConfigurationException | SAXException | IOException e) {
+
+            NodeList nList = doc.getElementsByTagName("diagramID");
+            for (int temp = 0; temp < nList.getLength(); temp++) {
+                Node nNode = nList.item(temp);
+                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element eElement = (Element) nNode;
+                    includedDiagrams.add(eElement.getTextContent());
+                }
+            }
+        } catch (Exception e) {
             e.printStackTrace();
             Application.getInstance().getGUILog().showError("Error Occurred");
         }
@@ -66,8 +76,12 @@ public class OnSaveListener implements SaveParticipant {
         if (Application.getInstance().getGUILog().showQuestion("Would you like to update the wiki page on SharePoint?")) {
             Collection<DiagramPresentationElement> diagrams = project.getDiagrams();
             for (DiagramPresentationElement dpe : diagrams)
-                if (new File(fileLoc + '\\' + dpe.getDiagram().getName() + ".svg").exists() == false)
+                if (new File(fileLoc + '\\' + dpe.getDiagram().getName() + "" +
+                        ".svg").exists() == false) {
+                    Application.getInstance().getGUILog().log("Diagram ID: "
+                            + dpe.getDiagram().getID());
                     dirtyDiagrams.add(dpe);
+                }
             makeNewDirectory(fileLoc); // Create project_diagrams folder if it isn't already created
 
             // Iterate over every .svg in project's folder, check if it is in the list of project diagrams, and if not: delete
@@ -122,7 +136,7 @@ public class OnSaveListener implements SaveParticipant {
             Application.getInstance().getGUILog().log("0% Complete", true);
         }
         for (DiagramPresentationElement dpe : diagrams) {
-            if (dpe != null) {
+            if (dpe != null ) { //&& includedDiagrams.contains(dpe.getDiagram().getID())
                 count++;
                 File img = new File(fileLoc + '\\' + dpe.getDiagram().getName() + ".svg");
                 Application.getInstance().getGUILog().log("Exporting " + dpe.getDiagram().getName() + ".svg (" + count + "/" + total + ")", true);
@@ -145,7 +159,6 @@ public class OnSaveListener implements SaveParticipant {
      *
      * @param fileLoc location of folder being saved to, has drive for first
      *                two characters and proper path to file
-     * @return true if drive is created successful
      */
     private void createDrive(String fileLoc) {
         createDrive(fileLoc, " https:\\\\larced.spstg.jsc.nasa.gov\\sites\\EDM\\seemb\\sandbox");
@@ -157,7 +170,6 @@ public class OnSaveListener implements SaveParticipant {
      *
      * @param fileLoc location of folder being saved to, has drive for first
      *                two characters and proper path to file
-     * @return true if drive is created successful
      */
     private void createDrive(String fileLoc, String networkLocation) {
         // Grabs the first two letters of fileLoc
