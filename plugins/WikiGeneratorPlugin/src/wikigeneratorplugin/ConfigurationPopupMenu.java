@@ -2,27 +2,20 @@ package wikigeneratorplugin;
 
 import com.nomagic.magicdraw.core.Application;
 import com.nomagic.magicdraw.core.Project;
-import com.nomagic.magicdraw.properties.PropertyManager;
 import com.nomagic.magicdraw.uml.symbols.DiagramPresentationElement;
-import com.sun.webkit.dom.DocumentImpl;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-import javax.print.Doc;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.DataInput;
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 
 /**
@@ -36,16 +29,17 @@ public class ConfigurationPopupMenu {
     private DocumentBuilderFactory dbFactory;
     private DocumentBuilder dBuilder;
     private Document doc;
+    private Project project;
 
     public ConfigurationPopupMenu() {
         try {
             dbFactory = DocumentBuilderFactory.newInstance();
             dBuilder = dbFactory.newDocumentBuilder();
-            doc = null;
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         }
-
+        project = Application.getInstance().getProject();
+        doc = null;
         Collection<DiagramPresentationElement> dpes = Application.getInstance()
                 .getProject().getDiagrams();
         included = dpes.toArray();
@@ -56,7 +50,7 @@ public class ConfigurationPopupMenu {
         try {
             // Set up file and doc builder
             File fXmlFile = new File
-                    ("resources/pluginconfig.xml");
+                    ("resources/" + project.getName() + "config.xml");
             if (!fXmlFile.exists()) {
                 createNewXML(fXmlFile);
             } else {

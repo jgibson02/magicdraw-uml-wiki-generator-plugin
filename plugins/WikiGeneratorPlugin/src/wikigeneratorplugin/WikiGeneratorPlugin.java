@@ -9,7 +9,6 @@ import com.nomagic.magicdraw.uml.symbols.DiagramPresentationElement;
 import java.util.HashSet;
 
 public class WikiGeneratorPlugin extends Plugin {
-    private String fileLoc;
 
     @Override
     public void init() {
