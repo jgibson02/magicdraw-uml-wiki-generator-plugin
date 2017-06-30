@@ -17,8 +17,10 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 
 /**
  * Author: Kareem Abdol-Hamid kkabdolh
@@ -27,14 +29,14 @@ import java.util.HashSet;
 public class OnSaveListener implements SaveParticipant {
 
     private HashSet<DiagramPresentationElement> dirtyDiagrams;
-    private HashSet<String> includedDiagrams;
+    private LinkedList<String> includedDiagrams;
     private String fileLoc;
 
     OnSaveListener(HashSet<DiagramPresentationElement> dirtyDiagrams,
                    String fileLoc) {
         this.dirtyDiagrams = dirtyDiagrams;
         this.fileLoc = fileLoc;
-        this.includedDiagrams = new HashSet<String>();
+        this.includedDiagrams = new LinkedList<String>();
     }
 
     @Override
@@ -44,14 +46,14 @@ public class OnSaveListener implements SaveParticipant {
 
     @Override
     public void doBeforeSave(Project project, ProjectDescriptor projectDescriptor) {
-        Application.getInstance().getGUILog().log("test1");
+        includedDiagrams.clear();
         System.out.println("Working Directory = " +
                 System.getProperty("user.dir"));
         try {
             //TODO: This file location may cause issues in the future,
             // lookout for relative path
             File fXmlFile = new File
-                    ("../WikiGeneratorPlugin/resources/pluginconfig.xml");
+                    ("resources/pluginconfig.xml");
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(fXmlFile);
@@ -75,6 +77,7 @@ public class OnSaveListener implements SaveParticipant {
     public void doAfterSave(Project project, ProjectDescriptor projectDescriptor) {
         if (Application.getInstance().getGUILog().showQuestion("Would you like to update the wiki page on SharePoint?")) {
             Collection<DiagramPresentationElement> diagrams = project.getDiagrams();
+            System.out.println(diagrams.toString());
             for (DiagramPresentationElement dpe : diagrams)
                 if (new File(fileLoc + '\\' + dpe.getDiagram().getName() + "" +
                         ".svg").exists() == false && includedDiagrams.contains(dpe.getDiagram().getID())) {
@@ -87,16 +90,25 @@ public class OnSaveListener implements SaveParticipant {
             // Iterate over every .svg in project's folder, check if it is in the list of project diagrams, and if not: delete
             File siteAssetsDirectory = new File(fileLoc);
             File[] existentFiles = siteAssetsDirectory.listFiles((dir, name) -> name.toLowerCase().endsWith(".svg"));
+            System.out.println(includedDiagrams.toString());
             for (File f : existentFiles) {
                 String diagramNameFromFile = f.getName().replace(".svg", "");
                 boolean isInDiagrams = false;
+                boolean included = false;
+                System.out.println(diagrams.toString());
                 for (DiagramPresentationElement dpe : diagrams) {
-                    if (dpe.getDiagram().getName().equals(diagramNameFromFile))
+                    if (dpe.getDiagram().getName().equals(diagramNameFromFile)) {
                         isInDiagrams = true;
+                        if(includedDiagrams.contains(dpe.getDiagram().getID())) {
+                            included = true;
+                        }
+                    }
                 }
-                if (isInDiagrams == false)
-                    Application.getInstance().getGUILog().log("Deleting " + f.getName(), true);
+
+                if (!isInDiagrams || !included) {
+                    Application.getInstance().getGUILog().log("Deleting " + f.getName());
                     f.delete();
+                }
             }
 
             exportDiagrams(dirtyDiagrams, fileLoc);
@@ -108,7 +120,6 @@ public class OnSaveListener implements SaveParticipant {
      * Creates a diagram for a given project
      *
      * @param fileLoc location of folder being saved to, path is accessible
-     * @return true if the project exists already or was successfully created
      */
     private void makeNewDirectory(String fileLoc) {
         File theDir = new File(fileLoc);
