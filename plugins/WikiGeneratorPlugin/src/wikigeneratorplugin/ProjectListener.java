@@ -27,9 +27,9 @@ public class ProjectListener implements ProjectEventListener {
 
     @Override
     public void projectOpened(final Project project) {
-        String fileLoc = DESTINATION + project.getName() + "_DIAGRAMS";
+        String diagramsDirectory = DESTINATION + project.getName() + "_DIAGRAMS";
         Application.getInstance().addSaveParticipant(new
-                OnSaveListener(dirtyDiagrams, fileLoc));
+                OnSaveListener(dirtyDiagrams, diagramsDirectory));
         DiagramListenerAdapter adapter = new DiagramListenerAdapter(new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
