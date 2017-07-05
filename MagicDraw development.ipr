@@ -222,6 +222,7 @@
     <library name="javax.json-api-1.0">
       <CLASSES>
         <root url="jar://$USER_HOME$/Downloads/javax.json-api-1.0.jar!/" />
+        <root url="jar://$USER_HOME$/Downloads/javax.json-1.1.0-M2.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

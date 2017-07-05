@@ -14,15 +14,7 @@ import org.w3c.dom.NodeList;
 import javax.json.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -93,7 +85,6 @@ public class OnSaveListener implements SaveParticipant {
                 String diagramNameFromFile = f.getName().replace(".svg", "");
                 boolean isInDiagrams = false;
                 boolean included = false;
-                System.out.println(diagrams.toString());
                 for (DiagramPresentationElement dpe : diagrams) {
                     if (dpe.getDiagram().getName().equals(diagramNameFromFile)) {
                         isInDiagrams = true;
@@ -109,7 +100,6 @@ public class OnSaveListener implements SaveParticipant {
                     f.delete();
                 }
             }
-
             exportDiagrams(project, dirtyDiagrams, diagramsDirectory);
             dirtyDiagrams.clear();
         }
@@ -189,7 +179,7 @@ public class OnSaveListener implements SaveParticipant {
                         .build()
                 );
             } else {
-                System.out.println(SVGFileLocation.getAbsolutePath() + "does not exist.");
+                System.out.println(SVGFileLocation.getAbsolutePath() + " does not exist.");
             }
         }
         projectObjectBuilder.add("diagrams", diagramArrayBuilder.build());
@@ -198,7 +188,7 @@ public class OnSaveListener implements SaveParticipant {
         Application.getInstance().getGUILog().log("Writing project JSON to: " + jsonLocation.getAbsolutePath());
         System.out.println("Writing project JSON to: " + jsonLocation.getAbsolutePath());
         // Writes assembled JSON to disk.
-        try (JsonWriter writer = Json.createWriter(new FileOutputStream(jsonLocation))) {
+        try (JsonWriter writer = Json.createWriterFactory(null).createWriter(new FileOutputStream(jsonLocation))) {
             writer.write(projectJsonObject);
         } catch (FileNotFoundException e) {
             Application.getInstance().getGUILog().showMessage(e.getMessage());
