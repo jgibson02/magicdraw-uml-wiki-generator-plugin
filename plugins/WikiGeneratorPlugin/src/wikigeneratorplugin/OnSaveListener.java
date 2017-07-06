@@ -14,10 +14,14 @@ import org.w3c.dom.NodeList;
 import javax.json.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.awt.*;
 import java.io.*;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.net.URI;
+import java.nio.file.Files;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Author: Kareem Abdol-Hamid kkabdolh
@@ -123,6 +127,7 @@ public class OnSaveListener implements SaveParticipant {
             Application.getInstance().getGUILog().log("0% Complete", true);
         }
 
+        /*
         // Create JSON object of project and diagram data.
         JsonBuilderFactory factory = Json.createBuilderFactory(null);
         JsonObject projectJsonObject;
@@ -132,6 +137,7 @@ public class OnSaveListener implements SaveParticipant {
                 .add("revision", 89)
                 .add("lastUser", "nphojana");
         JsonArrayBuilder diagramArrayBuilder = factory.createArrayBuilder();
+        */
 
         for (DiagramPresentationElement dpe : dirtyDiagrams) {
             if (dpe != null) {
@@ -156,6 +162,10 @@ public class OnSaveListener implements SaveParticipant {
 
         Application.getInstance().getGUILog().log("Constructing JSON data of project.", true);
         System.out.println("Constructing JSON data of project.");
+
+        // Why use a document templating engine when you have STRINGS
+        String html = "<html> <head> <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">  <!-- CSS --> <link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css\" integrity=\"sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ\" crossorigin=\"anonymous\"> <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css\"> <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.9.0/css/lightbox.min.css\"> <link rel=\"stylesheet\" href=\"styles.css\">  <!-- JavaScript --> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js\"></script> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js\"></script> <script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js\"></script> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.9.0/js/lightbox-plus-jquery.min.js\"></script> <script src=\"scripts.js\"></script> </head> <body> <div class=\"wrapper card col-md-8 offset-md-2\"> <div class=\"navbar-form row\"> <select class=\"form-control\" id=\"project-select\"> <option>Project</option> <option>FUELEAP</option> <option>TestingProj</option> </select> <div class=\"dropdown btn-group\"> <button id=\"filter-list-dropdown\" type=\"button\" class=\"btn btn-secondary dropdown-toggle\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">Filter By Type</button> <div class=\"dropdown-menu\" aria-labelledby=\"filter-list-dropdown\"> <table id=\"filter-list\" class=\"dropdown-item\"> <tr> <td>Activity Diagram</td> <td><input type=\"checkbox\" name=\"act-check\" checked></input> </tr> <tr> <td>Block Definition Diagram</td> <td><input type=\"checkbox\" name=\"bdd-check\" checked></input> </tr> <tr> <td>Internal Block Diagram</td> <td><input type=\"checkbox\" name=\"ibd-check\" checked></input> </tr> <tr> <td>Package Diagram</td> <td><input type=\"checkbox\" name=\"pkg-check\" checked></input> </tr> <tr> <td>Parametric Diagram</td> <td><input type=\"checkbox\" name=\"par-check\" checked></input> </tr> <tr> <td>Requirement Diagram</td> <td><input type=\"checkbox\" name=\"req-check\" checked></input> </tr> <tr> <td>Sequence Diagram</td> <td><input type=\"checkbox\" name=\"sd-check\" checked></input> </tr> <tr> <td>State Machine Diagram</td> <td><input type=\"checkbox\" name=\"stm-check\" checked></input> </tr> <tr> <td>Use Case Diagram</td> <td><input type=\"checkbox\" name=\"uc-check\" checked></input> </tr> </table> </div> </div> <!-- Search Bar --> <div class=\"input-group add-on\"> <div class=\"input-group-btn\" id=\"search-btn\"> <button class=\"btn btn-default\"><i class=\"fa fa-search\"></i></button> </div> <input class=\"form-control\" placeholder=\"Search\" name=\"srch-term\" id=\"srch-term\" type=\"text\"> </div> <!-- / Search Bar --> </div> <div id=\"list-container\">";
+
         /**
          * Now that necessary deletions and new updates have been handled, build JSON out of the images in the
          * PROJECTNAME_DIAGRAMS directory.
@@ -168,20 +178,38 @@ public class OnSaveListener implements SaveParticipant {
                 Application.getInstance().getGUILog().log("Adding " + SVGFileLocation.getName() + " to JSON data.", true);
                 System.out.println("Adding " + SVGFileLocation.getName() + " to JSON data.");
 
+                String url = "https://larced.spstg.jsc.nasa.gov/sites/EDM/seemb/sandbox/SiteAssets/" + project.getName() + "_DIAGRAMS/" + diagramName + ".svg".replace(" ", "%20");
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
+                df.setTimeZone(TimeZone.getTimeZone("UTC"));
+                String iso8601LastModified = df.format(new Date(SVGFileLocation.lastModified()));
+
+                html += "<div class=\"card diagram-card pkg\"><div class=\"card-block\"><h4 class=\"card-title\">"+diagramName+"</h4><p class=\"card-text\">Package Diagram</p><p class=\"text-muted\"><small>Last updated: "+iso8601LastModified+"</small></p></div><a href=\""+url+"\" data-lightbox=\""+diagramName+"\" data-title=\""+diagramName+"\"><img class=\"card-img-bottom\" src=\""+url+"\"></a></div>";
+
+                /*
                 diagramArrayBuilder.add(factory.createObjectBuilder()
-                        // TODO: Find API methods to get real metadata
                         .add("name", diagramName)
-                        .add("author", "nphojana")
-                        .add("lastModified", "10/7/16 12:41PM")
-                        .add("lastModifiedBy", "nphojana")
-                        .add("created", "10/7/16 12:38PM")
-                        .add("url", "https://larced.spstg.jsc.nasa.gov/sites/EDM/seemb/sandbox/SiteAssets/" + project.getName() + "_DIAGRAMS/" + diagramName + ".svg")
+                        .add("lastModified", iso8601LastModified)
+                        .add("lastModifiedBy", System.getProperty("user.name"))
+                        .add("url", url.replace(" ", "%20")) // Sort of URL encode the svg path
                         .build()
                 );
+                */
             } else {
                 System.out.println(SVGFileLocation.getAbsolutePath() + " does not exist.");
             }
         }
+
+        html += "<h2 class=\"no-results-message\">No results found.</h2></div></div></div></body></html>";
+
+        File htmlFile = new File("S:\\SitePages\\"+project.getName()+"_WIKI.html");
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(htmlFile))) {
+            writer.write(html);
+            Desktop.getDesktop().browse(URI.create("https://larced.spstg.jsc.nasa.gov/sites/EDM/seemb/sandbox/SitePages/"+project.getName()+"_WIKI.html"));
+        } catch (IOException e) {
+
+        }
+
+        /*
         projectObjectBuilder.add("diagrams", diagramArrayBuilder.build());
         projectJsonObject = projectObjectBuilder.build();
         File jsonLocation = new File("s:\\SiteAssets\\" + project.getName() + ".json");
@@ -194,6 +222,7 @@ public class OnSaveListener implements SaveParticipant {
             Application.getInstance().getGUILog().showMessage(e.getMessage());
             e.printStackTrace();
         }
+        */
     }
 
     /**
