@@ -39,6 +39,9 @@ public class ConfigurationPopupMenu extends JFrame {
     private Document doc;
     private Project project;
 
+    /**
+     * Testing if I can properly commit 
+     */
     public ConfigurationPopupMenu() {
         super("Includes/Excludes");
 
