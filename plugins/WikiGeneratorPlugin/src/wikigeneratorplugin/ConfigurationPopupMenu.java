@@ -30,6 +30,10 @@ import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 /**
  * Author: Kareem Abdol-Hamid kkabdolh
  * Version: 6/29/2017
+ *
+ * This class is used to generate a popup menu in MagicDraw for the user to
+ * interact with, it allows the user to choose which diagrams they want to
+ * include in  their SharePoint upload
  */
 public class ConfigurationPopupMenu extends JFrame {
 
@@ -39,9 +43,10 @@ public class ConfigurationPopupMenu extends JFrame {
     private Document doc;
     private Project project;
 
-    /**
-     * Testing if I can properly commit 
-     */
+    //==========================================================================
+    // CONSTRUCTOR FUNCTIONS
+    //==========================================================================
+
     public ConfigurationPopupMenu() {
         super("Includes/Excludes");
 
@@ -165,16 +170,26 @@ public class ConfigurationPopupMenu extends JFrame {
         this.setVisible(true);
     }
 
+    //==========================================================================
+    // PRIVATE FUNCTIONS
+    //==========================================================================
+
+    /**
+     * Generate an XML file either creating a new one or editing an old one,
+     * adding new diagramIDs for the newly included diagramsIDs
+     */
     private void generateXML() {
         try {
             // Set up file and doc builder
             File fXmlFile = new File
                     ("resources/" + project.getName() + "config.xml");
+            // If the file doesn't already exist, create it
             if (!fXmlFile.exists()) {
                 createNewXML(fXmlFile);
-            } else {
+            } else { // otherwise create a new doc from it
                 doc = dBuilder.parse(fXmlFile);
             }
+            // parse doc from the include element
             doc.getDocumentElement().normalize();
             Node includeElement = doc.getElementsByTagName("include").item(0);
             if (includeElement == null) {
@@ -218,21 +233,43 @@ public class ConfigurationPopupMenu extends JFrame {
         }
     }
 
+    /**
+     * Creates a new XML file that has the basic structure of a project XML
+     * for this plugin.
+     * Example:
+     *  <plugin>
+     *      <settings>
+     *          <include>
+     *
+     *          </include>
+     *          <colors>
+     *
+     *          </colors>
+     *      </settings>
+     *  </plugin>
+     *
+     *  This basic outline is generated with the name of the file given
+     * @param file file that will be used to generate
+     */
     private void createNewXML(File file) {
         try {
-            // Create new XML if the file doesn't already exist
+            // Create new XML if the file doesn't already exist and make
+            // plugin the root
             doc = dBuilder.newDocument();
             Element rootElement = doc.createElement("plugin");
             doc.appendChild(rootElement);
 
+            // Add a settings element under plugin root element
             Element settings = doc.createElement("settings");
             rootElement.appendChild(settings);
 
+            // Add include and colors element under settings element
             Element include = doc.createElement("include");
             Element colors = doc.createElement("colors");
             settings.appendChild(include);
             settings.appendChild(colors);
 
+            // Save the doc as an xml with the given file paramter
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(doc);

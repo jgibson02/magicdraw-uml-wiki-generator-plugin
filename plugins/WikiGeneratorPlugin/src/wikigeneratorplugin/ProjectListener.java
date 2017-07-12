@@ -18,7 +18,6 @@ import java.util.HashSet;
  */
 public class ProjectListener implements ProjectEventListener {
 
-    private static final String DESTINATION = "s:\\SiteAssets\\";
     private HashSet<DiagramPresentationElement> dirtyDiagrams;
 
     ProjectListener(HashSet<DiagramPresentationElement> dirtyDiagrams) {
@@ -27,7 +26,7 @@ public class ProjectListener implements ProjectEventListener {
 
     @Override
     public void projectOpened(final Project project) {
-        String diagramsDirectory = DESTINATION + project.getName() + "_DIAGRAMS";
+        String diagramsDirectory = "s:\\SitePages\\" + project.getName() + "\\diagrams\\";
         Application.getInstance().addSaveParticipant(new
                 OnSaveListener(dirtyDiagrams, diagramsDirectory));
         DiagramListenerAdapter adapter = new DiagramListenerAdapter(new PropertyChangeListener() {

@@ -18,22 +18,36 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.awt.*;
 import java.io.*;
 import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Author: Kareem Abdol-Hamid kkabdolh
  * Version: 6/27/2017
+ * <p>
+ * This respoonds anytime a MagicDraw project with this plugin installed is
+ * saved. It will ask the user if they want to upload their changes to
+ * SharePoint or not. The class uses the changes to the diagrams and the
+ * projectconfig.xml to decide which files are uploaded to the SharePoint.
  */
 public class OnSaveListener implements SaveParticipant {
 
     private HashSet<DiagramPresentationElement> dirtyDiagrams;
-    private LinkedList<String> includedDiagrams;
-    private String diagramsDirectory;
+    private LinkedList<String> includedDiagrams; // List of diagram IDs for diagrams specified as included in the XML
+    private String diagramsDirectory; // S:\SitePages\PROJECTNAME\diagrams
 
+    /**
+     * Takes an input of changed diagrams and diagram directory
+     *
+     * @param dirtyDiagrams     the list of dirty diagrams (diagrams that have
+     *                          been changed in any way)
+     * @param diagramsDirectory the file locatoin of the diagrams on SharePoint
+     */
     OnSaveListener(HashSet<DiagramPresentationElement> dirtyDiagrams,
                    String diagramsDirectory) {
         this.dirtyDiagrams = dirtyDiagrams;
@@ -41,15 +55,26 @@ public class OnSaveListener implements SaveParticipant {
         this.includedDiagrams = new LinkedList<String>();
     }
 
+    /**
+     * Intentially empty, no purpose
+     */
     @Override
     public boolean isReadyForSave(Project project, ProjectDescriptor projectDescriptor) {
         return true;
     }
 
+    /**
+     * Before the program saves, gets the list of files that need to be included
+     *
+     * @param project           the project that's being worked on
+     * @param projectDescriptor the ProjectDescriptor of the project being
+     *                          worked on
+     */
     @Override
     public void doBeforeSave(Project project, ProjectDescriptor projectDescriptor) {
         includedDiagrams.clear();
         try {
+            // Parse projectconfig.xml for diagrams that need to be included
             File fXmlFile = new File
                     ("resources/" + project.getName() + "config.xml");
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -71,30 +96,53 @@ public class OnSaveListener implements SaveParticipant {
         }
     }
 
+    /**
+     * Aftre the project is succesfully saved, it will ask if the user wants
+     * to edit the SharePoint wiki page based off the changes since the last
+     * upload. If yet, it will continue forward and upload all files that
+     * have been changed or added (that are in included) and remove all
+     * diagrams that are no longer in included or no longer exist
+     *
+     * @param project           the project that's being worked on
+     * @param projectDescriptor the ProjectDescriptor of the project being
+     *                          worked on
+     */
     @Override
     public void doAfterSave(Project project, ProjectDescriptor projectDescriptor) {
+
+        // Set up and prompt user if they want to upload to SharePoint and if
+        // they want to have the page open or not
         JCheckBox openWikiPageCheckbox = new JCheckBox("Open after completion?", true);
         String promptMessage = "Update the wiki page on SharePoint?";
         Object[] params = {promptMessage, openWikiPageCheckbox};
         int dialogResponse = JOptionPane.showConfirmDialog(null, params, "Question", JOptionPane.YES_NO_OPTION);
         boolean openWikiPage = openWikiPageCheckbox.isSelected();
 
+        // If ues, continue with the upload process
         if (dialogResponse == JOptionPane.YES_OPTION) {
+            // Get all diagrams and add new ones that are in the project config
             Collection<DiagramPresentationElement> diagrams = project.getDiagrams();
+            makeNewDirectory(diagramsDirectory); // Create project diagrams folder if it isn't already created
             for (DiagramPresentationElement dpe : diagrams) {
-                if (!new File(diagramsDirectory + '\\' + dpe.getDiagram().getName() + "" +
-                        ".svg").exists() && includedDiagrams.contains(dpe.getDiagram().getID())) {
+                // Add to dirtyDiagrams if they are not in the project file
+                // and they are in the included diagrams list
+                if (!(new File(diagramsDirectory + dpe.getDiagram().getName() +
+                        ".svg")).exists() && includedDiagrams.contains(dpe.getDiagram().getID())) {
                     dirtyDiagrams.add(dpe);
                 }
             }
-            makeNewDirectory(diagramsDirectory); // Create project_diagrams folder if it isn't already created
-            // Iterate over every .svg in project's folder, check if it is in the list of project diagrams, and if not: delete
-            File siteAssetsDirectory = new File(diagramsDirectory);
-            File[] existentFiles = siteAssetsDirectory.listFiles((dir, name) -> name.toLowerCase().endsWith(".svg"));
+            // Iterate over every .svg in project's folder, check if it is in
+            // the list of project diagrams and is in the include list, and if
+            // not: delete
+            File diagramsDirectoryFile = new File(diagramsDirectory);
+            System.out.println("diagramsDirectory: ["+diagramsDirectory+"]");
+            System.out.println("diagramsDirectoryFile path: ["+diagramsDirectoryFile.getAbsolutePath()+"]");
+            File[] existentFiles = diagramsDirectoryFile.listFiles((dir, name) -> name.toLowerCase().endsWith(".svg"));
             for (File f : existentFiles) {
                 String diagramNameFromFile = f.getName().replace(".svg", "");
                 boolean isInDiagrams = false;
                 boolean included = false;
+                // TODO: THIS CAN BE FIXED TO BE CLEANER I'M SURE
                 for (DiagramPresentationElement dpe : diagrams) {
                     if (dpe.getDiagram().getName().equals(diagramNameFromFile)) {
                         isInDiagrams = true;
@@ -104,12 +152,15 @@ public class OnSaveListener implements SaveParticipant {
                     }
                 }
 
+                // Delete if not in included or diagram no longer exists
                 if (!isInDiagrams || !included) {
                     Application.getInstance().getGUILog().log("Deleting " + f.getName());
                     System.out.print("Deleting " + f.getName());
                     f.delete();
                 }
             }
+
+            // Go to export then clear dirty diagrams list
             exportDiagrams(project, dirtyDiagrams, diagramsDirectory);
             dirtyDiagrams.clear();
 
@@ -127,7 +178,13 @@ public class OnSaveListener implements SaveParticipant {
             JsonArrayBuilder diagramArrayBuilder = factory.createArrayBuilder();
 
             // Why use a document templating engine when you have STRINGS
-            String html = "<html> <head> <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">  <!-- CSS --> <link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css\" integrity=\"sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ\" crossorigin=\"anonymous\"> <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css\"> <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.9.0/css/lightbox.min.css\"> <link rel=\"stylesheet\" href=\"css/styles.css\">  <!-- JavaScript --> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js\"></script> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js\"></script> <script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js\"></script> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.9.0/js/lightbox-plus-jquery.min.js\"></script> <script src=\"js/scripts.js\"></script> </head> <body> <div class=\"wrapper card col-md-8 offset-md-2\"> <div class=\"navbar-form row\"> <select class=\"form-control\" id=\"project-select\"> <option>Project</option> <option>FUELEAP</option> <option>TestingProj</option> </select> <div class=\"dropdown btn-group\"> <button id=\"filter-list-dropdown\" type=\"button\" class=\"btn btn-secondary dropdown-toggle\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">Filter By Type</button> <div class=\"dropdown-menu\" aria-labelledby=\"filter-list-dropdown\"> <table id=\"filter-list\" class=\"dropdown-item\"> <tr> <td>Activity Diagram</td> <td><input type=\"checkbox\" name=\"act-check\" checked></input> </tr> <tr> <td>Block Definition Diagram</td> <td><input type=\"checkbox\" name=\"bdd-check\" checked></input> </tr> <tr> <td>Internal Block Diagram</td> <td><input type=\"checkbox\" name=\"ibd-check\" checked></input> </tr> <tr> <td>Package Diagram</td> <td><input type=\"checkbox\" name=\"pkg-check\" checked></input></td></tr><tr><td>Parametric Diagram</td> <td><input type=\"checkbox\" name=\"par-check\" checked></input></td></tr><tr><td>Requirement Diagram</td> <td><input type=\"checkbox\" name=\"req-check\" checked></input></td></tr><tr><td>Sequence Diagram</td><td><input type=\"checkbox\" name=\"sd-check\" checked></input></td></tr><tr><td>State Machine Diagram</td><td><input type=\"checkbox\" name=\"stm-check\" checked></input></td></tr><tr><td>Use Case Diagram</td><td><input type=\"checkbox\" name=\"uc-check\" checked></input></td></tr> <tr><td>Non-SysML Diagram</td><td><input type=\"checkbox\" name=\"non-sysml-check\" checked></input></td></tr></table> </div> </div> <!-- Search Bar --> <div class=\"input-group add-on\"> <div class=\"input-group-btn\" id=\"search-btn\"> <button class=\"btn btn-default\"><i class=\"fa fa-search\"></i></button> </div> <input class=\"form-control\" placeholder=\"Search\" name=\"srch-term\" id=\"srch-term\" type=\"text\"> </div> <!-- / Search Bar --> </div> <div id=\"list-container\">";
+            String html = "";
+            try {
+                byte[] encodedHTMLContent = Files.readAllBytes(new File("htmlTemplate.txt").toPath());
+                html = new String(encodedHTMLContent, StandardCharsets.US_ASCII);
+            } catch (IOException e) {
+                System.err.println("Could not read HTML template from file.");
+            }
 
             /**
              * Now that necessary deletions and new updates have been handled, build JSON out of the images in the
@@ -141,10 +198,11 @@ public class OnSaveListener implements SaveParticipant {
                     Application.getInstance().getGUILog().log("Adding " + SVGFileLocation.getName() + " to JSON data.", true);
                     System.out.println("Adding " + SVGFileLocation.getName() + " to JSON data.");
 
-                    String url = "https://larced.spstg.jsc.nasa.gov/sites/EDM/seemb/sandbox/SiteAssets/" + project.getName() + "_DIAGRAMS/" + diagramName + ".svg".replace(" ", "%20");
-                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
+                    String url = "diagrams/" + diagramName + ".svg".replace(" ", "%20");
+                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd', 'HH:mm");
                     df.setTimeZone(TimeZone.getTimeZone("UTC"));
                     String iso8601LastModified = df.format(new Date(SVGFileLocation.lastModified()));
+                    String lastModifiedBy = System.getProperty("user.name");
                     String diagramType = dpe.getDiagramType().getType(), diagramClass = ".undefined";
                     switch (diagramType) {
                         case "SysML Activity Diagram":
@@ -175,16 +233,25 @@ public class OnSaveListener implements SaveParticipant {
                             diagramType = "Use Case Diagram"; diagramClass = "uc";
                             break;
                         default:
-                            diagramType += " (Non-SysML)"; diagramClass = "non-sysml";
+                            diagramType += " (Other)"; diagramClass = "other";
                     }
 
-                    html += "<div class=\"card diagram-card "+diagramClass+"\"><div class=\"card-block\"><h4 class=\"card-title\">"+diagramName+"</h4><p class=\"card-text\">"+diagramType+"</p><p class=\"text-muted\"><small>Last updated: "+iso8601LastModified+"</small></p></div><a href=\""+url+"\" data-lightbox=\""+diagramName+"\" data-title=\""+diagramName+"\"><img class=\"card-img-bottom\" src=\""+url+"\"></a></div>";
+                    html += "<div class=\"card diagram-card "+diagramClass+"\">" +
+                                "<div class=\"card-block\">" +
+                                    "<h4 class=\"card-title\">"+diagramName+"</h4>" +
+                                    "<p class=\"card-text\">"+diagramType+"</p>" +
+                                    "<p class=\"text-muted\"><small>Last updated: "+iso8601LastModified+" by " + lastModifiedBy + "</small></p>" +
+                                "</div>" +
+                                "<a href=\""+url+"\" data-lightbox=\""+diagramName+"\" data-title=\""+diagramName+"\">" +
+                                    "<img class=\"card-img-bottom\" src=\""+url+"\">" +
+                                "</a>" +
+                            "</div>";
 
                     diagramArrayBuilder.add(factory.createObjectBuilder()
                             .add("name", diagramName)
                             .add("lastModified", iso8601LastModified)
-                            .add("lastModifiedBy", System.getProperty("user.name"))
-                            .add("url", url.replace(" ", "%20")) // Sort of URL encode the svg path
+                            .add("lastModifiedBy", lastModifiedBy)
+                            .add("url", url) // Sort of URL encode the svg path
                             .build()
                     );
                 } else {
@@ -194,11 +261,11 @@ public class OnSaveListener implements SaveParticipant {
 
             html += "<h2 class=\"no-results-message\">No results found.</h2></div></div></div></body></html>";
 
-            File htmlFile = new File("S:\\SitePages\\"+project.getName()+"_WIKI.html");
+            File htmlFile = new File("S:\\SitePages\\"+project.getName()+"\\"+project.getName()+"_diagrams.html");
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(htmlFile))) {
                 writer.write(html);
                 if (openWikiPage)
-                    Desktop.getDesktop().browse(URI.create("https://larced.spstg.jsc.nasa.gov/sites/EDM/seemb/sandbox/SitePages/"+project.getName()+"_WIKI.html"));
+                    Desktop.getDesktop().browse(URI.create("https://larced.spstg.jsc.nasa.gov/sites/EDM/seemb/sandbox/SitePages/"+project.getName()+"/"+project.getName()+"_diagrams.html"));
             } catch (IOException e) {
                 System.out.println("Error writing HTML to SharePoint:");
                 e.printStackTrace();
@@ -207,12 +274,12 @@ public class OnSaveListener implements SaveParticipant {
 
             projectObjectBuilder.add("diagrams", diagramArrayBuilder.build());
             projectJsonObject = projectObjectBuilder.build();
-            File jsonLocation = new File("s:\\SiteAssets\\" + project.getName() + ".json");
+            File jsonLocation = new File("s:\\SitePages\\"+project.getName()+"\\" + project.getName()+".json");
             Application.getInstance().getGUILog().log("Writing project JSON to: " + jsonLocation.getAbsolutePath());
             System.out.println("Writing project JSON to: " + jsonLocation.getAbsolutePath());
             // Writes assembled JSON to disk.
             try (JsonWriter writer = Json.createWriterFactory(null).createWriter(new FileOutputStream(jsonLocation))) {
-                writer.write(projectJsonObject);
+                writer.writeObject(projectJsonObject);
             } catch (FileNotFoundException e) {
                 Application.getInstance().getGUILog().showMessage(e.getMessage());
                 e.printStackTrace();
