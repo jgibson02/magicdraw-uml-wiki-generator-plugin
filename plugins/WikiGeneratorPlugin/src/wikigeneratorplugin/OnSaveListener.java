@@ -18,10 +18,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.awt.*;
 import java.io.*;
 import java.net.URI;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -30,7 +28,7 @@ import java.util.*;
  * Author: Kareem Abdol-Hamid kkabdolh
  * Version: 6/27/2017
  * <p>
- * This respoonds anytime a MagicDraw project with this plugin installed is
+ * This responds anytime a MagicDraw project with this plugin installed is
  * saved. It will ask the user if they want to upload their changes to
  * SharePoint or not. The class uses the changes to the diagrams and the
  * projectconfig.xml to decide which files are uploaded to the SharePoint.
@@ -56,7 +54,7 @@ public class OnSaveListener implements SaveParticipant {
     }
 
     /**
-     * Intentially empty, no purpose
+     * Intentionally empty, no purpose
      */
     @Override
     public boolean isReadyForSave(Project project, ProjectDescriptor projectDescriptor) {
@@ -154,9 +152,10 @@ public class OnSaveListener implements SaveParticipant {
 
                 // Delete if not in included or diagram no longer exists
                 if (!isInDiagrams || !included) {
-                    Application.getInstance().getGUILog().log("Deleting " + f.getName());
-                    System.out.print("Deleting " + f.getName());
-                    f.delete();
+                    if (f.delete()) { // if deletion succeeds
+                        Application.getInstance().getGUILog().log("Deleting " + f.getName());
+                        System.out.print("Deleting " + f.getName());
+                    }
                 }
             }
 
@@ -177,7 +176,7 @@ public class OnSaveListener implements SaveParticipant {
                     .add("lastUser", "nphojana");
             JsonArrayBuilder diagramArrayBuilder = factory.createArrayBuilder();
 
-            // Why use a document templating engine when you have STRINGS
+            // Why use a templating engine when you have STRINGS
             String html = "";
             try {
                 byte[] encodedHTMLContent = Files.readAllBytes(new File("htmlTemplate.txt").toPath());
