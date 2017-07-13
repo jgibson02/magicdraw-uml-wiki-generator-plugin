@@ -166,6 +166,7 @@ public class OnSaveListener implements SaveParticipant {
             Application.getInstance().getGUILog().log("Constructing JSON data of project.", true);
             System.out.println("Constructing JSON data of project.");
 
+            /*
             // Create JSON object of project and diagram data.
             JsonBuilderFactory factory = Json.createBuilderFactory(null);
             JsonObject projectJsonObject;
@@ -175,6 +176,7 @@ public class OnSaveListener implements SaveParticipant {
                     .add("revision", 89)
                     .add("lastUser", "nphojana");
             JsonArrayBuilder diagramArrayBuilder = factory.createArrayBuilder();
+            */
 
             // Why use a templating engine when you have STRINGS
             String html = "";
@@ -198,7 +200,7 @@ public class OnSaveListener implements SaveParticipant {
                     System.out.println("Adding " + SVGFileLocation.getName() + " to JSON data.");
 
                     String url = "diagrams/" + diagramName + ".svg".replace(" ", "%20");
-                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd', 'HH:mm");
+                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd', 'HH:mm' UTC'");
                     df.setTimeZone(TimeZone.getTimeZone("UTC"));
                     String iso8601LastModified = df.format(new Date(SVGFileLocation.lastModified()));
                     String lastModifiedBy = System.getProperty("user.name");
@@ -246,6 +248,7 @@ public class OnSaveListener implements SaveParticipant {
                                 "</a>" +
                             "</div>";
 
+                    /*
                     diagramArrayBuilder.add(factory.createObjectBuilder()
                             .add("name", diagramName)
                             .add("lastModified", iso8601LastModified)
@@ -253,6 +256,7 @@ public class OnSaveListener implements SaveParticipant {
                             .add("url", url) // Sort of URL encode the svg path
                             .build()
                     );
+                    */
                 } else {
                     System.out.println(SVGFileLocation.getAbsolutePath() + " does not exist.");
                 }
@@ -271,6 +275,7 @@ public class OnSaveListener implements SaveParticipant {
                 Application.getInstance().getGUILog().showMessage("Error writing HTML to SharePoint:\n" + e.getMessage());
             }
 
+            /*
             projectObjectBuilder.add("diagrams", diagramArrayBuilder.build());
             projectJsonObject = projectObjectBuilder.build();
             File jsonLocation = new File("s:\\SitePages\\"+project.getName()+"\\" + project.getName()+".json");
@@ -283,6 +288,7 @@ public class OnSaveListener implements SaveParticipant {
                 Application.getInstance().getGUILog().showMessage(e.getMessage());
                 e.printStackTrace();
             }
+            */
         }
     }
 
