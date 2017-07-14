@@ -15,8 +15,7 @@ public class WikiGeneratorPlugin extends Plugin {
         ActionsConfiguratorsManager manager = ActionsConfiguratorsManager.getInstance();
         MDAction action = new ToolsMenuAction();
         manager.addMainMenuConfigurator( new ToolsMenuConfigurator( action ) );
-        final HashSet<DiagramPresentationElement> dirtyDiagrams = new HashSet<>();
-        ProjectListener projListener= new ProjectListener(dirtyDiagrams);
+        ProjectListener projListener= new ProjectListener();
         Application.getInstance().getProjectsManager().addProjectListener(projListener);
     }
 

@@ -1,9 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 <head>
-    <meta name="generator" content="HTML Tidy for Linux (vers 25 March 2009), see www.w3.org" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 	
@@ -40,7 +36,7 @@
 			border: 1px solid rgba(0, 0, 0, 0.125);
 			border-radius: 0.5em 0.5em 0 0;
 			box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
-			
+			display: flex;
 		}
 
 		.row {
@@ -64,6 +60,22 @@
 		.add-on .form-control:focus {
 			border-color: rgb(92, 179, 253) !important;
 		}
+		
+		#project-name-header {
+			color: white;
+			vertical-align: middle;
+		}
+		
+		/* Flex Alignments for Navbar */ 
+		#filter-list {
+			align-self: left;
+		}
+		#project-name-header {
+			align-self: center;
+		}
+		#search-bar {
+			align-self: right;
+		}
 
 		#search-btn {
 			border: 1px solid rgba(0, 0, 0, 0.125);
@@ -85,7 +97,19 @@
 		 -webkit-transition: .25s box-shadow;
 		 transition: .25s box-shadow;
 		}
-
+		
+		.diagram-card {
+			border-radius: 0.5rem;
+		}
+		
+		.card-block {
+			padding: 0.9rem 1.25rem;
+		}
+		
+		.card-block p {
+			margin-bottom: 0;
+		}
+		
 		.diagram-card:focus, .diagram-card:hover {
 		 box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 30px 0 rgba(0, 0, 0, 0.3);
 		}
@@ -120,6 +144,11 @@
 
 		#filter-list tr td {
 			padding: 0px 10px 0px 10px;
+		}
+		
+		.tally-count {
+			text-align: right;
+			font-weight: 500;
 		}
 
 		#filter-list tr {
@@ -156,6 +185,7 @@
 		#list-container > .card .card-img-bottom {
 			max-width: 100%;
 			width: 100%;
+			border-radius: 0 0 0.5rem 0.5rem;
 		}
 
 		#list-container > .card:not(:last-child) {
@@ -225,16 +255,15 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.9.0/js/lightbox-plus-jquery.min.js"></script>
     <script>
 		var updateTallyCount = function() {
-			$("#act-count").text($(".act:visible").length);
-			$("#bdd-count").text($(".bdd:visible").length);
-			$("#ibd-count").text($(".ibd:visible").length);
-			$("#pkg-count").text($(".pkg:visible").length);
-			$("#par-count").text($(".par:visible").length);
-			$("#req-count").text($(".req:visible").length);
-			$("#sd-count").text($(".sd:visible").length);
-			$("#stm-count").text($(".stm:visible").length);
-			$("#uc-count").text($(".uc:visible").length);
-			$("#other-count").text($(".other:visible").length);
+			$("#act-count").text($("input[name='act-check']").is(':checked') ? $(".act:visible").length : "");
+			$("#bdd-count").text($("input[name='bdd-check']").is(':checked') ? $(".bdd:visible").length : "");
+			$("#ibd-count").text($("input[name='ibd-check']").is(':checked') ? $(".ibd:visible").length : "");
+			$("#pkg-count").text($("input[name='pkg-check']").is(':checked') ? $(".pkg:visible").length : "");
+			$("#par-count").text($("input[name='par-check']").is(':checked') ? $(".par:visible").length : "");
+			$("#req-count").text($("input[name='req-check']").is(':checked') ? $(".req:visible").length : "");
+			$("#sd-stm-count").text($("input[name='sd-stm-check']").is(':checked') ? $(".sd:visible").length + $(".stm:visible").length : "");
+			$("#uc-count").text($("input[name='uc-check']").is(':checked') ? $(".uc:visible").length : "");
+			$("#other-count").text($("input[name='other-check']").is(':checked') ? $(".other:visible").length : "");
 		}
 		
 		var checkResults = function() {
@@ -272,15 +301,13 @@
 			else
 				$(".req").removeClass("hidden-by-check");
 			
-			if ($("input[name='sd-check']").is(':checked') === false) 
+			if ($("input[name='sd-stm-check']").is(':checked') === false) {
 				$(".sd").addClass("hidden-by-check");
-			else
-				$(".sd").removeClass("hidden-by-check");
-			
-			if ($("input[name='stm-check']").is(':checked') === false) 
 				$(".stm").addClass("hidden-by-check");
-			else
+			} else {
+				$(".sd").removeClass("hidden-by-check");
 				$(".stm").removeClass("hidden-by-check");
+			}
 			
 			if ($("input[name='uc-check']").is(':checked') === false) 
 				$(".uc").addClass("hidden-by-check");
@@ -315,7 +342,9 @@
 
 		window.onload = function() {
 			$("svg").addClass("card-img-bottom");
-			$(".no-results-message").hide();
+			if ($(".diagram-card:visible").length > 0) { 
+				$(".no-results-message").hide(); 
+			}
 			$("input[type='checkbox']:not(input[name='all-check'])").change(checkResults);
 			$("input[name='all-check']").change(function() {
 				if ($(this).is(":checked")) {
@@ -337,12 +366,11 @@
 	
     <title></title>
 </head>
-
 <body>
     <div class="wrapper card col-md-8 offset-md-2">
         <div class="navbar-form row">
             <div class="dropdown btn-group">
-                <button id="filter-list-dropdown" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Filter By Type</button>
+                <button id="filter-list-dropdown" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Type (SysML diagram kind)</button>
 
                 <div class="dropdown-menu" aria-labelledby="filter-list-dropdown">
                     <table id="filter-list" class="dropdown-item">
@@ -351,61 +379,60 @@
                             <td><input type="checkbox" name="all-check" checked="checked" /></td>
                         </tr>
                         <tr>
-                            <td>Activity Diagram</td>
-							<td><span id="act-count" class="tally-count"></span></td>
+                            <td>Process Flow/Flow Chart (act)</td>
+							<td id="act-count" class="tally-count"></td>
                             <td><input type="checkbox" name="act-check" checked="checked" /></td>
                         </tr>
                         <tr>
-                            <td>Block Definition Diagram</td>
-							<td><span id="bdd-count" class="tally-count"></span></td>
+                            <td>Architecture/Decomposition (bdd)</td>
+							<td id="bdd-count" class="tally-count"></td>
                             <td><input type="checkbox" name="bdd-check" checked="checked" /></td>
                         </tr>
                         <tr>
-                            <td>Internal Block Diagram</td>
-							<td><span id="ibd-count" class="tally-count"></span></td>
+                            <td>Interface (ibd)</td>
+							<td id="ibd-count" class="tally-count"></td>
                             <td><input type="checkbox" name="ibd-check" checked="checked" /></td>
                         </tr>
                         <tr>
-                            <td>Package Diagram</td>
-							<td><span id="pkg-count" class="tally-count"></span></td>
+                            <td>Doc Tree/Organization</td>
+							<td id="pkg-count" class="tally-count"></td>
                             <td><input type="checkbox" name="pkg-check" checked="checked" /></td>
                         </tr>
                         <tr>
-                            <td>Parametric Diagram</td>
-							<td><span id="par-count" class="tally-count"></span></td>
+                            <td>Parametric (par)</td>
+							<td id="par-count" class="tally-count"></td>
                             <td><input type="checkbox" name="par-check" checked="checked" /></td>
                         </tr>
                         <tr>
-                            <td>Requirement Diagram</td>
-							<td><span id="req-count" class="tally-count"></span></td>
+                            <td>Requirement (req)</td>
+							<td id="req-count" class="tally-count"></td>
                             <td><input type="checkbox" name="req-check" checked="checked" /></td>
                         </tr>
                         <tr>
-                            <td>Sequence Diagram</td>
-							<td><span id="sd-count" class="tally-count"></span></td>
-                            <td><input type="checkbox" name="sd-check" checked="checked" /></td>
+                            <td>Interaction/System Behavior</td>
+							<td id="sd-stm-count" class="tally-count"></td>
+                            <td><input type="checkbox" name="sd-stm-check" checked="checked" /></td>
                         </tr>
                         <tr>
-                            <td>State Machine Diagram</td>
-							<td><span id="stm-count" class="tally-count"></span></td>
-                            <td><input type="checkbox" name="stm-check" checked="checked" /></td>
-                        </tr>
-                        <tr>
-                            <td>Use Case Diagram</td>
-							<td><span id="uc-count" class="tally-count"></span></td>
+                            <td>Stakeholder Analysis (uc)</td>
+							<td id="uc-count" class="tally-count"></td>
                             <td><input type="checkbox" name="uc-check" checked="checked" /></td>
                         </tr>
                         <tr>
-                            <td>Other Diagrams</td>
-							<td><span id="other-count" class="tally-count"></span></td>
+                            <td>Other</td>
+							<td id="other-count" class="tally-count"></td>
                             <td><input type="checkbox" name="other-check" checked="checked" /></td>
                         </tr>
                     </table>
                 </div>
             </div>
+			<!-- <h3 id="project-name-header">{{PROJECT_NAME}}</h3> -->
 			<!-- Search Bar -->
-            <div class="input-group add-on">
-                <div class="input-group-btn" id="search-btn"></div><input class="form-control" placeholder="Search" name="srch-term" id="srch-term" type="text" />
+            <div id="search-bar" class="input-group add-on">
+                <div class="input-group-btn" id="search-btn">
+					<button class="btn btn-default"><i class="fa fa-search"></i></button>
+				</div>
+				<input class="form-control" placeholder="Search" name="srch-term" id="srch-term" type="text" />
             </div>
 			<!-- / Search Bar -->
         </div>

@@ -1,5 +1,6 @@
 package wikigeneratorplugin;
 
+
 import com.nomagic.magicdraw.core.Application;
 import com.nomagic.magicdraw.core.Project;
 import com.nomagic.magicdraw.uml.symbols.DiagramPresentationElement;
@@ -93,17 +94,21 @@ public class ConfigurationPopupMenu extends JFrame {
         includesJList.setCellRenderer(new DiagramPresentationElementListCellRender());
         DefaultListModel<DiagramPresentationElement> excludesListModel = new DefaultListModel<>();
         DefaultListModel<DiagramPresentationElement> includesListModel = new DefaultListModel<>();
+        StringBuilder includedDiagramsList = new StringBuilder("\n======== Included Diagrams ========\n");
         for (DiagramPresentationElement dpe : dpes) {
             boolean isInIncludedDiagrams = false;
             for (String s : includedDiagrams) {
                 if (s.equals(dpe.getDiagram().getID()))
                     isInIncludedDiagrams = true;
             }
-            if (isInIncludedDiagrams)
+            if (isInIncludedDiagrams) {
+                includedDiagramsList.append(dpe.getDiagram().getName() + "\n");
                 includesListModel.addElement(dpe);
-            else
+            } else {
                 excludesListModel.addElement(dpe);
+            }
         }
+        System.out.println(includedDiagramsList.toString() + "===================================");
         excludesJList.setModel(excludesListModel);
         includesJList.setModel(includesListModel);
 
@@ -192,28 +197,28 @@ public class ConfigurationPopupMenu extends JFrame {
             doc.getDocumentElement().normalize();
             Node includeElement = doc.getElementsByTagName("include").item(0);
             if (includeElement == null) {
-                System.out.println("IT'S A NULLPOINTER HERE");
-            }
-            // Removes all previous diagramIDs
-            if (includeElement.getNodeType() == Node.ELEMENT_NODE) {
-                NodeList nList = doc.getElementsByTagName("diagramID");
-                for (int temp = 0; temp < nList.getLength(); temp++) {
-                    Node nNode = nList.item(temp);
-                    if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-                        includeElement.removeChild(nNode);
+                System.out.println("Includes list from user's project configuration XML does not exist. Check plugin's resources directory.");
+            } else {
+                // Removes all previous diagramIDs
+                if (includeElement.getNodeType() == Node.ELEMENT_NODE) {
+                    NodeList nList = doc.getElementsByTagName("diagramID");
+                    for (int temp = 0; temp < nList.getLength(); temp++) {
+                        Node nNode = nList.item(temp);
+                        if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                            includeElement.removeChild(nNode);
+                        }
                     }
                 }
-            }
-
-            // Adds new ones from selected list
-            for (Object dpeObj : included) {
-                if (dpeObj instanceof DiagramPresentationElement) {
-                    DiagramPresentationElement dpe =
-                            (DiagramPresentationElement) dpeObj;
-                    Element diagramID = doc.createElement("diagramID");
-                    diagramID.appendChild(doc.createTextNode(dpe.getDiagram().getID()));
-                    if (includeElement.getNodeType() == Node.ELEMENT_NODE) {
-                        includeElement.appendChild(diagramID);
+                // Adds new ones from selected list
+                for (Object dpeObj : included) {
+                    if (dpeObj instanceof DiagramPresentationElement) {
+                        DiagramPresentationElement dpe =
+                                (DiagramPresentationElement) dpeObj;
+                        Element diagramID = doc.createElement("diagramID");
+                        diagramID.appendChild(doc.createTextNode(dpe.getDiagram().getID()));
+                        if (includeElement.getNodeType() == Node.ELEMENT_NODE) {
+                            includeElement.appendChild(diagramID);
+                        }
                     }
                 }
             }
