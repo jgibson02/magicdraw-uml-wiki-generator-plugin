@@ -14,7 +14,7 @@ public class WikiGeneratorPlugin extends Plugin {
     public void init() {
         ActionsConfiguratorsManager manager = ActionsConfiguratorsManager.getInstance();
         MDAction action = new ToolsMenuAction();
-        manager.addMainMenuConfigurator( new ToolsMenuConfigurator( action ) );
+        manager.addMainMenuConfigurator(new ToolsMenuConfigurator(action));
         ProjectListener projListener= new ProjectListener();
         Application.getInstance().getProjectsManager().addProjectListener(projListener);
     }

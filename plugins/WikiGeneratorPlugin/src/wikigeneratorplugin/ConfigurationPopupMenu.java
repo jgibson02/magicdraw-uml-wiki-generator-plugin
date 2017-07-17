@@ -1,6 +1,5 @@
 package wikigeneratorplugin;
 
-
 import com.nomagic.magicdraw.core.Application;
 import com.nomagic.magicdraw.core.Project;
 import com.nomagic.magicdraw.uml.symbols.DiagramPresentationElement;
@@ -10,8 +9,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -21,11 +18,10 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Collection;
 import java.util.LinkedList;
-
-import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 
 /**
  * Author: Kareem Abdol-Hamid kkabdolh
@@ -42,13 +38,34 @@ public class ConfigurationPopupMenu extends JFrame {
     private DocumentBuilder dBuilder;
     private Document doc;
     private Project project;
+    private JTextField urlInputField;
+    private DefaultListModel<String> emailListModel;
+    private DefaultListModel<DiagramPresentationElement> excludesListModel;
+    private DefaultListModel<DiagramPresentationElement> includesListModel;
+    private JList emailList;
+    private JList excludesList;
+    private JList includesList;
+    private JButton cancelButton;
+    private JButton includeSingleButton;
+    private JButton includeAllButton;
+    private JButton excludeSingleButton;
+    private JButton excludeAllButton;
+    private JButton okButton;
+    private JButton removeButton;
+    private JButton addButton;
+    private JLabel urlInputFieldLabel;
+    private JLabel emailListLabel;
+    private JLabel includesListLabel;
+    private JLabel excludesListLabel;
+    private JPanel rootPanel;
+    private JPanel confirmationButtonsPanel;
 
     //==========================================================================
     // CONSTRUCTOR FUNCTIONS
     //==========================================================================
 
     public ConfigurationPopupMenu() {
-        super("Includes/Excludes");
+        super("SharePoint Plugin Options");
 
         project = Application.getInstance().getProject();
         doc = null;
@@ -85,15 +102,10 @@ public class ConfigurationPopupMenu extends JFrame {
             e.printStackTrace();
         }
 
-        setLayout(new GridLayout(1, 3));
-        JList excludesJList = new JList();
-        JList includesJList = new JList();
-        excludesJList.setSelectionMode(SINGLE_SELECTION);
-        includesJList.setSelectionMode(SINGLE_SELECTION);
-        excludesJList.setCellRenderer(new DiagramPresentationElementListCellRender());
-        includesJList.setCellRenderer(new DiagramPresentationElementListCellRender());
-        DefaultListModel<DiagramPresentationElement> excludesListModel = new DefaultListModel<>();
-        DefaultListModel<DiagramPresentationElement> includesListModel = new DefaultListModel<>();
+        includesList.setCellRenderer(new DiagramPresentationElementListCellRender());
+        excludesList.setCellRenderer(new DiagramPresentationElementListCellRender());
+        excludesListModel = new DefaultListModel<>();
+        includesListModel = new DefaultListModel<>();
         StringBuilder includedDiagramsList = new StringBuilder("\n======== Included Diagrams ========\n");
         for (DiagramPresentationElement dpe : dpes) {
             boolean isInIncludedDiagrams = false;
@@ -109,26 +121,29 @@ public class ConfigurationPopupMenu extends JFrame {
             }
         }
         System.out.println(includedDiagramsList.toString() + "===================================");
-        excludesJList.setModel(excludesListModel);
-        includesJList.setModel(includesListModel);
+        includesList.setModel(excludesListModel);
+        excludesList.setModel(includesListModel);
 
-        // Initialize components for buttons panel
-        JPanel buttonsPanel = new JPanel();
-        buttonsPanel.setLayout(new GridLayout(6, 1));
-        JButton includeSingleButton = new JButton(">");
-        JButton includeAllButton = new JButton(">>");
-        JButton excludeSingleButton = new JButton("<");
-        JButton excludeAllButton = new JButton("<<");
-        JButton okButton = new JButton("OK");
-        JButton cancelButton = new JButton("Cancel");
+        emailListModel = new DefaultListModel<>();
+        emailList.setModel(emailListModel);
+
+        addButton.addActionListener((ActionEvent e) -> {
+            String newEmail = JOptionPane.showInputDialog("Email address of new recipient:");
+            if (newEmail != null) {
+                emailListModel.addElement(newEmail);
+            }
+        });
+        removeButton.addActionListener((ActionEvent e) -> {
+            emailListModel.removeElement(emailList.getSelectedIndex());
+        });
 
         includeSingleButton.addActionListener((ActionEvent e) -> {
-            DiagramPresentationElement dpe = (DiagramPresentationElement) excludesJList.getSelectedValue();
+            DiagramPresentationElement dpe = (DiagramPresentationElement) includesList.getSelectedValue();
             includesListModel.addElement(dpe);
             excludesListModel.removeElement(dpe);
         });
         excludeSingleButton.addActionListener((ActionEvent e) -> {
-            DiagramPresentationElement dpe = (DiagramPresentationElement) includesJList.getSelectedValue();
+            DiagramPresentationElement dpe = (DiagramPresentationElement) excludesList.getSelectedValue();
             excludesListModel.addElement(dpe);
             includesListModel.removeElement(dpe);
         });
@@ -152,23 +167,7 @@ public class ConfigurationPopupMenu extends JFrame {
             this.dispose();
         });
 
-        // Add buttons to button panel
-        buttonsPanel.add(includeSingleButton);
-        buttonsPanel.add(includeAllButton);
-        buttonsPanel.add(excludeSingleButton);
-        buttonsPanel.add(excludeAllButton);
-        buttonsPanel.add(okButton);
-        buttonsPanel.add(cancelButton);
-
-        this.getRootPane().setBorder(new EmptyBorder(15, 15, 15, 15));
-        JScrollPane excludesPane = new JScrollPane(excludesJList);
-        JScrollPane includesPane = new JScrollPane(includesJList);
-        excludesPane.setBorder(new TitledBorder("Excludes"));
-        includesPane.setBorder(new TitledBorder("Includes"));
-        this.add(excludesPane);
-        this.add(buttonsPanel);
-        this.add(includesPane);
-
+        this.add(rootPanel);
         this.setLocationRelativeTo(null);
         this.pack();
         this.setVisible(true);
@@ -183,6 +182,14 @@ public class ConfigurationPopupMenu extends JFrame {
      * adding new diagramIDs for the newly included diagramsIDs
      */
     private void generateXML() {
+        // TODO: Include the information from the URL inputfield and the email list in the XML.
+        // The inputfield has the sysmldiagrams subsite URL as its default unless there is a value in the XML file to
+        // overwrite it. So, you can always depend on just grabbing whatever's in the inputfield as the new URL for the
+        // XML file. We'll have to put in a check at some point if it's an invalid URL.
+        // As for the email list, you can get an array of its Strings with emailListModel.toArray(). Add those to the XML
+        // under a single node, and concatenate them into one string separated by semicolons.
+        // Once those're written to the XML, I can get to work on reading in their values throughout the plugin.
+
         try {
             // Set up file and doc builder
             File fXmlFile = new File
