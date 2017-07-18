@@ -9,6 +9,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileSystemView;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -20,6 +21,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -34,6 +37,7 @@ import java.util.LinkedList;
 public class ConfigurationPopupMenu extends JFrame {
 
     private String url;
+    private char driveLetter;
     private Object[] emails;
     private Object[] included;
     private DocumentBuilderFactory dbFactory;
@@ -44,6 +48,7 @@ public class ConfigurationPopupMenu extends JFrame {
     private DefaultListModel<String> emailListModel;
     private DefaultListModel<DiagramPresentationElement> excludesListModel;
     private DefaultListModel<DiagramPresentationElement> includesListModel;
+    private DefaultComboBoxModel<String> driveLetterDropdownModel;
     private JList emailList;
     private JList excludesList;
     private JList includesList;
@@ -57,10 +62,14 @@ public class ConfigurationPopupMenu extends JFrame {
     private JButton addButton;
     private JLabel urlInputFieldLabel;
     private JLabel emailListLabel;
-    private JLabel includesListLabel;
     private JLabel excludesListLabel;
+    private JLabel includesListLabel;
     private JPanel rootPanel;
     private JPanel confirmationButtonsPanel;
+    private JComboBox driveLetterDropdown;
+    private JLabel driveLetterDropdownLabel;
+    private JScrollPane excludesScrollPane;
+    private JScrollPane includesScrollPane;
     private JComboBox driveNameDropdown;
 
     //==========================================================================
@@ -83,6 +92,7 @@ public class ConfigurationPopupMenu extends JFrame {
         excludesListModel = new DefaultListModel<>();
         includesListModel = new DefaultListModel<>();
         emailListModel = new DefaultListModel<>();
+        driveLetterDropdownModel = new DefaultComboBoxModel<>();
 
         try {
             dbFactory = DocumentBuilderFactory.newInstance();
@@ -95,14 +105,22 @@ public class ConfigurationPopupMenu extends JFrame {
         }
 
         if (fXmlFile.exists()) {
-
             try {
-                // Update URL input field with value from XML
+                // Retrieve SharePoint site URL from XML file
                 String spSiteURL = doc.getElementsByTagName("url").item(0).getTextContent(); // There should only be 1 <url> element
                 urlInputField.setText(spSiteURL);
             } catch(Exception e) {
                 System.err.println("Error retrieving SharePoint site URL from plugin configuration XML.");
                 Application.getInstance().getGUILog().showError("Error retrieving SharePoint site URL from plugin configuration XML.");
+                e.printStackTrace();
+            }
+
+            try {
+                // Retrieve network drive letter from XML file
+                this.driveLetter = doc.getElementsByTagName("driveLetter").item(0).getTextContent().charAt(0);
+            } catch (Exception e) {
+                System.err.println("Error retrieving network drive letter from plugin configuration XML.");
+                Application.getInstance().getGUILog().showError("Error retrieving network drive letter from plugin configuration XML.");
                 e.printStackTrace();
             }
 
@@ -121,7 +139,7 @@ public class ConfigurationPopupMenu extends JFrame {
                 } else {
                     System.out.println("No emails found.");
                 }
-                System.out.println("\n==================================");
+                System.out.println("==================================");
             } catch (Exception e) {
                 System.err.println("Error retrieving email recipients list from plugin configuration XML.");
                 Application.getInstance().getGUILog().showError("Error retrieving email recipients list from plugin configuration XML.");
@@ -145,6 +163,16 @@ public class ConfigurationPopupMenu extends JFrame {
             }
         }
 
+        // Sets the dropdown options for drive letter to be all unused drive letters, and drive letters currently mapped to network drives
+        FileSystemView fsv = FileSystemView.getFileSystemView();
+        ArrayList<File> roots = new ArrayList<>(Arrays.asList(File.listRoots()));
+        for (char i = 'A'; i <= 'Z'; i++) {
+            File rootDrive = new File(String.valueOf(i) + ":\\");
+            if (!roots.contains(rootDrive) || (roots.contains(rootDrive) && fsv.getSystemTypeDescription(rootDrive).equals("Network Drive"))) {
+                driveLetterDropdownModel.addElement(rootDrive.toString());
+            }
+        }
+
         includesList.setCellRenderer(new DiagramPresentationElementListCellRender());
         excludesList.setCellRenderer(new DiagramPresentationElementListCellRender());
 
@@ -152,8 +180,10 @@ public class ConfigurationPopupMenu extends JFrame {
         for (DiagramPresentationElement dpe : dpes) {
             boolean isInIncludedDiagrams = false;
             for (String s : includedDiagrams) {
-                if (s.equals(dpe.getDiagram().getID()))
+                if (s.equals(dpe.getDiagram().getID())) {
                     isInIncludedDiagrams = true;
+                    break; // already found, skip rest
+                }
             }
             if (isInIncludedDiagrams) {
                 includedDiagramsList.append(dpe.getDiagram().getName() + "\n");
@@ -166,6 +196,8 @@ public class ConfigurationPopupMenu extends JFrame {
         includesList.setModel(includesListModel);
         excludesList.setModel(excludesListModel);
         emailList.setModel(emailListModel);
+        driveLetterDropdown.setModel(driveLetterDropdownModel);
+        driveLetterDropdown.setSelectedItem(String.valueOf(this.driveLetter) + ":\\");
 
         addButton.addActionListener((ActionEvent e) -> {
             String newEmail = JOptionPane.showInputDialog("Email address of new recipient:");
@@ -203,16 +235,37 @@ public class ConfigurationPopupMenu extends JFrame {
         okButton.addActionListener((ActionEvent e) -> {
             included = includesListModel.toArray();
             emails = emailListModel.toArray();
+
+            // Check for changes to URL or drive letter
+            String currentDriveLetter = ((String) driveLetterDropdown.getSelectedItem()).substring(0, 1);
+            if (currentDriveLetter.equals(String.valueOf(this.driveLetter)) == false) {
+                deleteNetworkDrive(new File(String.valueOf(this.driveLetter) + ":"));
+            }
+            this.driveLetter = currentDriveLetter.charAt(0);
             String currentURL = urlInputField.getText();
             if (currentURL.equals(this.url) == false) {
-                createDrive(currentURL);
+                createDrive(this.driveLetter, currentURL);
             }
             this.url = currentURL;
+
             generateXML();
         });
         cancelButton.addActionListener((ActionEvent e) -> this.dispose());
 
+        // Nimbus Look-And-Feel
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            // If Nimbus is not available, you can set the GUI to another look and feel.
+        }
+
         this.add(rootPanel);
+        this.getRootPane().setDefaultButton(okButton);
         this.setLocationRelativeTo(null);
         this.pack();
         this.setVisible(true);
@@ -241,6 +294,7 @@ public class ConfigurationPopupMenu extends JFrame {
             Node includeElement = doc.getElementsByTagName("include").item(0);
             Node emailElement = doc.getElementsByTagName("emails").item(0);
             Node urlElement = doc.getElementsByTagName("url").item(0);
+            Node driveLetterElement = doc.getElementsByTagName("driveLetter").item(0);
             if (includeElement == null) {
                 System.out.println("Includes list from user's project configuration XML does not exist. Check plugin's resources directory.");
             } else {
@@ -252,6 +306,7 @@ public class ConfigurationPopupMenu extends JFrame {
                 }
                 emailElement.setTextContent(emailStringBuilder.toString());
                 urlElement.setTextContent(this.url);
+                driveLetterElement.setTextContent(String.valueOf(this.driveLetter));
             }
 
             // Pushes changes to file
@@ -325,13 +380,14 @@ public class ConfigurationPopupMenu extends JFrame {
             rootElement.appendChild(settings);
 
             // Add include and colors element under settings element
+            Element url = doc.createElement("url");
+            Element driveLetter = doc.createElement("driveLetter");
+            Element emails = doc.createElement("emails");
             Element include = doc.createElement("include");
             Element colors = doc.createElement("colors");
-            Element emails = doc.createElement("emails");
-            Element url = doc.createElement("url");
-            Element driveName = doc.createElement("driveName");
-            settings.appendChild(driveName);
+
             settings.appendChild(url);
+            settings.appendChild(driveLetter);
             settings.appendChild(emails);
             settings.appendChild(include);
             settings.appendChild(colors);
@@ -350,40 +406,26 @@ public class ConfigurationPopupMenu extends JFrame {
     }
 
     private void createDrive(String networkLocation) {
-        createDrive("S", networkLocation);
+        createDrive('S', networkLocation);
     }
 
     /**
      * Creates a network drive connecting sandbox to computer.
      * TODO: Add user input for networkLocation
      *
-     * @param driveName location of folder being saved to, has drive for first
+     * @param driveLetter location of folder being saved to, has drive for first
      *                two characters and proper path to file
      */
-    private static void createDrive(String driveName, String networkLocation) {
+    private static void createDrive(char driveLetter, String networkLocation) {
         // Grabs the first two letters of diagramsDirectory
-        File drive = new File(driveName + ":");
+        File drive = new File(String.valueOf(driveLetter) + ":");
         // If the given drive doesn't already exist, if it does just continue
         if (drive.exists()) {
-            System.out.println("Drive Found");
-            try {
-                String command = "c:\\windows\\system32\\net.exe use " +
-                        drive + " /delete";
-                // Create a process for connecting and wait for it to finish
-                Process p = Runtime.getRuntime().exec(command);
-                System.out.println("Connecting new network drive...");
-                p.waitFor();
-                boolean success = p.exitValue() == 0;
-                p.destroy();
-                System.out.println("Deletion " + (success ? "Successful!" :
-                        "Failed."));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            deleteNetworkDrive(drive);
         }
         // Try connecting it to the given networkLocation
         try {
-            String command = "c:\\windows\\system32\\net.exe use " +
+            String command = System.getenv("SystemDrive") + "\\windows\\system32\\net.exe use " +
                     drive + " " + networkLocation;
             System.out.println(command);
             // Create a process for connecting and wait for it to finish
@@ -393,6 +435,23 @@ public class ConfigurationPopupMenu extends JFrame {
             boolean success = p.exitValue() == 0;
             p.destroy();
             System.out.println("Connection " + (success ? "Successful!" :
+                    "Failed."));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void deleteNetworkDrive(File driveToDelete) {
+        try {
+            String command = System.getenv("SystemDrive") + "\\windows\\system32\\net.exe use " +
+                    driveToDelete + " /delete";
+            // Create a process for connecting and wait for it to finish
+            Process p = Runtime.getRuntime().exec(command);
+            System.out.println("Connecting new network drive...");
+            p.waitFor();
+            boolean success = p.exitValue() == 0;
+            p.destroy();
+            System.out.println("Deletion " + (success ? "Successful!" :
                     "Failed."));
         } catch (Exception e) {
             e.printStackTrace();
