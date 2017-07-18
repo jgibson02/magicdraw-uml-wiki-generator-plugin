@@ -24,12 +24,12 @@
       </component>
       <component id="8e490" class="javax.swing.JTextField" binding="urlInputField">
         <constraints>
-          <grid row="1" column="0" row-span="1" col-span="4" vsize-policy="0" hsize-policy="2" anchor="8" fill="3" indent="0" use-parent-layout="false">
+          <grid row="1" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="2" anchor="8" fill="3" indent="0" use-parent-layout="false">
             <preferred-size width="248" height="24"/>
           </grid>
         </constraints>
         <properties>
-          <text value="https://larced.spstg.jsc.nasa.gov/EDM/seemb/sysmldiagram"/>
+          <text value="https://larced.spstg.jsc.nasa.gov/sites/EDM/seemb/sysmldiagram"/>
         </properties>
       </component>
       <component id="ade20" class="javax.swing.JLabel" binding="emailListLabel">
@@ -222,6 +222,12 @@
           </component>
         </children>
       </scrollpane>
+      <component id="28b49" class="javax.swing.JComboBox" binding="driveLetterDropdown">
+        <constraints>
+          <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+      </component>
     </children>
   </grid>
 </form>

@@ -45,6 +45,7 @@ public class ProjectListener implements ProjectEventListener {
     private LinkedList<String> includedDiagrams; // List of diagram IDs for diagrams specified as included in the XML
     private String diagramsDirectory; // S:\SitePages\PROJECTNAME\diagrams
     private String spSiteURL;
+    private String dsvEmailRecipients;
 
     /**
      * Initializes collections.
@@ -53,6 +54,7 @@ public class ProjectListener implements ProjectEventListener {
         this.dirtyDiagrams = new HashSet<>();
         this.includedDiagrams = new LinkedList<>();
         this.spSiteURL = null;
+        this.dsvEmailRecipients = null;
     }
 
     @Override
@@ -84,44 +86,63 @@ public class ProjectListener implements ProjectEventListener {
     @Override
     public void projectSaved(Project project, boolean b) {
         includedDiagrams.clear();
-        try {
-            // Parse projectconfig.xml for diagrams that need to be included
-            File fXmlFile = new File
-                    ("resources/" + project.getName() + "config.xml");
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(fXmlFile);
-            doc.getDocumentElement().normalize();
-
-            NodeList diagramNodeList = doc.getElementsByTagName("diagramID");
-            for (int temp = 0; temp < diagramNodeList.getLength(); temp++) {
-                Node diagramNode = diagramNodeList.item(temp);
-                if (diagramNode.getNodeType() == Node.ELEMENT_NODE) {
-                    Element diagramElement = (Element) diagramNode;
-                    includedDiagrams.add(diagramElement.getTextContent());
-                }
-            }
-
-            this.spSiteURL = doc.getElementById("url").getTextContent();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Application.getInstance().getGUILog().showError("Error Occurred");
-        }
 
         // Set up and prompt user if they want to upload to SharePoint and if
         // they want to have the page open or not
         JCheckBox openWikiPageCheckbox = new JCheckBox("Open after completion?", true);
+        JCheckBox emailCheckbox = new JCheckBox("Send email to your email list?", false);
+        emailCheckbox.setEnabled(false); // Disable checkbox if user has no email recipients
         String promptMessage = "Update the wiki page on SharePoint?";
-        Object[] params = {promptMessage, openWikiPageCheckbox};
+        Object[] params = {promptMessage, openWikiPageCheckbox, emailCheckbox};
+
+        boolean xmlExists = true;
+        try {
+            // Parse projectconfig.xml for diagrams that need to be included
+            File fXmlFile = new File
+                    ("resources/" + project.getName() + "config.xml");
+            if (fXmlFile.exists() == false) {
+                xmlExists = false;
+            } else {
+                DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+                Document doc = dBuilder.parse(fXmlFile);
+                doc.getDocumentElement().normalize();
+
+                NodeList diagramNodeList = doc.getElementsByTagName("diagramID");
+                for (int temp = 0; temp < diagramNodeList.getLength(); temp++) {
+                    Node diagramNode = diagramNodeList.item(temp);
+                    if (diagramNode.getNodeType() == Node.ELEMENT_NODE) {
+                        Element diagramElement = (Element) diagramNode;
+                        includedDiagrams.add(diagramElement.getTextContent());
+                    }
+                }
+
+                this.spSiteURL = doc.getElementsByTagName("url").item(0).getTextContent();
+                NodeList emailNodes = doc.getElementsByTagName("emails");
+                if (emailNodes.getLength() > 0) {
+                    this.dsvEmailRecipients = emailNodes.item(0).getTextContent();
+                    if (this.dsvEmailRecipients.length() > 0) {
+                        emailCheckbox.setEnabled(true);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         int dialogResponse = JOptionPane.showConfirmDialog(null, params, "Question", JOptionPane.YES_NO_OPTION);
         boolean openWikiPage = openWikiPageCheckbox.isSelected();
+        boolean sendEmail = emailCheckbox.isSelected();
 
         // If yes, continue with the upload process
         if (dialogResponse == JOptionPane.YES_OPTION) {
+            if (xmlExists == false) {
+                Application.getInstance().getGUILog().showError("No project config found for this project, please go to Tools -> SharePoint Plugin Options and configure options before continuing.");
+                return;
+            }
             // Get all diagrams and add new ones that are in the project config
             Collection<DiagramPresentationElement> diagrams = project.getDiagrams();
-            makeNewDirectory(diagramsDirectory); // Create project diagrams folder if it isn't already created
+            new File(diagramsDirectory).mkdirs(); // Create project diagrams folder if it isn't already created
             for (DiagramPresentationElement dpe : diagrams) {
                 // Add to dirtyDiagrams if they are not in the project file
                 // and they are in the included diagrams list
@@ -286,6 +307,15 @@ public class ProjectListener implements ProjectEventListener {
                 Application.getInstance().getGUILog().showMessage("Error writing HTML to SharePoint:\n" + e.getMessage());
             }
 
+            if (sendEmail) {
+                try {
+                    Desktop.getDesktop().browse(URI.create("mailto:"+dsvEmailRecipients));
+                } catch (IOException e) {
+                    Application.getInstance().getGUILog().showError("Could not create email for recipients: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+
             /*
             projectObjectBuilder.add("diagrams", diagramArrayBuilder.build());
             projectJsonObject = projectObjectBuilder.build();
@@ -300,7 +330,7 @@ public class ProjectListener implements ProjectEventListener {
                 e.printStackTrace();
             }
             */
-        }
+        } // if (dialogResponse == JOptionPane.YES_OPTION)
     }
 
     //===================================================
@@ -342,70 +372,6 @@ public class ProjectListener implements ProjectEventListener {
                 System.out.println((int) Math.round(((count / (double) total) * 100)) + "% " + "Complete");
             } // End diagrams loop
             System.out.println("======== Beginning Diagrams Export ========");
-        }
-    }
-
-    /**
-     * Creates the full path for a given project diagrams destination. Will also attempt to initialize the drive if it
-     * has not already been initialized.
-     *
-     * @param fileLoc location of folder being saved to, path is accessible
-     */
-    private void makeNewDirectory(String fileLoc) {
-        File theDir = new File(fileLoc);
-        // if the directory does not exist, create it
-        if (!theDir.exists()) {
-            try {
-                createDrive(fileLoc);
-                theDir.mkdirs();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * Creates a network drive connecting sandbox to computer.
-     * TODO: Add user input for networkLocation
-     *
-     * @param fileLoc location of folder being saved to, has drive for first
-     *                two characters and proper path to file
-     */
-    private void createDrive(String fileLoc) {
-        createDrive(fileLoc, this.spSiteURL);
-    }
-
-    /**
-     * Creates a network drive connecting sandbox to computer.
-     * TODO: Add user input for networkLocation
-     *
-     * @param fileLoc location of folder being saved to, has drive for first
-     *                two characters and proper path to file
-     */
-    private void createDrive(String fileLoc, String networkLocation) {
-        // Grabs the first two letters of diagramsDirectory
-        String driveName = fileLoc.length() < 2 ? fileLoc : fileLoc.substring(0,
-                2);
-        File drive = new File(driveName);
-        // If the given drive doesn't already exist, if it does just continue
-        if (!drive.exists()) {
-            // Try connecting it to the given networkLocation
-            try {
-                String command = "c:\\windows\\system32\\net.exe use " +
-                        drive + networkLocation;
-                // Create a process for connecting and wait for it to finish
-                Process p = Runtime.getRuntime().exec(command);
-                System.out.println("Connecting new network drive...");
-                p.waitFor();
-                boolean success = p.exitValue() == 0;
-                p.destroy();
-                System.out.println("Connection " + (success ? "Successful!" :
-                        "Failed."));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println("Drive Found");
         }
     }
 

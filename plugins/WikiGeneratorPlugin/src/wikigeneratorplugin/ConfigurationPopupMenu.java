@@ -61,6 +61,7 @@ public class ConfigurationPopupMenu extends JFrame {
     private JLabel excludesListLabel;
     private JPanel rootPanel;
     private JPanel confirmationButtonsPanel;
+    private JComboBox driveLetterDropdown;
 
     //==========================================================================
     // CONSTRUCTOR FUNCTIONS
@@ -75,10 +76,17 @@ public class ConfigurationPopupMenu extends JFrame {
         DiagramPresentationElement[] dpes = dpesCollection.toArray(new DiagramPresentationElement[dpesCollection.size()]);
         included = dpes;
 
+        File fXmlFile = new File("resources/" + project.getName() + "config.xml");
+
+        // Retrieve user settings from XML file
+        LinkedList<String> includedDiagrams = new LinkedList<String>();
+        excludesListModel = new DefaultListModel<>();
+        includesListModel = new DefaultListModel<>();
+        emailListModel = new DefaultListModel<>();
+
         try {
-            File fXmlFile = new File("resources/" + project.getName() + "config.xml");
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            dbFactory = DocumentBuilderFactory.newInstance();
+            dBuilder = dbFactory.newDocumentBuilder();
             this.doc = dBuilder.parse(fXmlFile);
             this.doc.getDocumentElement().normalize();
         } catch (Exception e) {
@@ -86,65 +94,55 @@ public class ConfigurationPopupMenu extends JFrame {
             e.printStackTrace();
         }
 
-        // Retrieve user settings from XML file
-        LinkedList<String> includedDiagrams = new LinkedList<String>();
-        String emailRecipients = null;
-        excludesListModel = new DefaultListModel<>();
-        includesListModel = new DefaultListModel<>();
-        emailListModel = new DefaultListModel<>();
-        try {
-            // Update URL input field with value from XML
-            String spSiteURL = doc.getElementsByTagName("url").item(0).getTextContent(); // There should only be 1 <url> element
-            urlInputField.setText(spSiteURL);
-        } catch(Exception e) {
-            System.err.println("Error retrieving SharePoint site URL from plugin configuration XML.");
-            Application.getInstance().getGUILog().showError("Error retrieving SharePoint site URL from plugin configuration XML.");
-            e.printStackTrace();
-        }
+        if (fXmlFile.exists()) {
 
-        try {
-            // Retrieve list of email recipients
-            NodeList emailNodeList = doc.getElementsByTagName("emails");
-            boolean hasEmails = emailNodeList.getLength() > 0;
-            System.out.println("\n======== Email Recipients ========");
-            if (hasEmails) {
-                String dsvEmailList = emailNodeList.item(0).getTextContent(); // There should only be 1 <emails> element
-                this.emails = dsvEmailList.split(";");
-                for (Object email : emails) {
-                    System.out.println((String) email);
-                    emailListModel.addElement((String) email);
-                }
-            } else {
-                System.out.println("No emails found.");
+            try {
+                // Update URL input field with value from XML
+                String spSiteURL = doc.getElementsByTagName("url").item(0).getTextContent(); // There should only be 1 <url> element
+                urlInputField.setText(spSiteURL);
+            } catch(Exception e) {
+                System.err.println("Error retrieving SharePoint site URL from plugin configuration XML.");
+                Application.getInstance().getGUILog().showError("Error retrieving SharePoint site URL from plugin configuration XML.");
+                e.printStackTrace();
             }
-            System.out.println("\n==================================");
-        } catch (Exception e) {
-            System.err.println("Error retrieving email recipients list from plugin configuration XML.");
-            Application.getInstance().getGUILog().showError("Error retrieving email recipients list from plugin configuration XML.");
-            e.printStackTrace();
-        }
 
-        try {
-            // Retrieve list of included and excluded diagrams' IDs
-            NodeList diagramNodeList = doc.getElementsByTagName("diagramID");
-            for (int i = 0; i < diagramNodeList.getLength(); i++) {
-                Node diagramNode = diagramNodeList.item(i);
-                if (diagramNode.getNodeType() == Node.ELEMENT_NODE) {
-                    Element diagramElement = (Element) diagramNode;
-                    includedDiagrams.add(diagramElement.getTextContent());
+            try {
+                // Retrieve list of email recipients
+                NodeList emailNodeList = doc.getElementsByTagName("emails");
+                boolean hasEmails = emailNodeList.getLength() > 0;
+                System.out.println("\n======== Email Recipients ========");
+                if (hasEmails) {
+                    String dsvEmailList = emailNodeList.item(0).getTextContent(); // There should only be 1 <emails> element
+                    this.emails = dsvEmailList.split(";");
+                    for (Object email : emails) {
+                        System.out.println((String) email);
+                        emailListModel.addElement((String) email);
+                    }
+                } else {
+                    System.out.println("No emails found.");
                 }
+                System.out.println("\n==================================");
+            } catch (Exception e) {
+                System.err.println("Error retrieving email recipients list from plugin configuration XML.");
+                Application.getInstance().getGUILog().showError("Error retrieving email recipients list from plugin configuration XML.");
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            System.err.println("Error retrieving included/excluded diagrams list from plugin configuration XML.");
-            Application.getInstance().getGUILog().showError("Error retrieving included/excluded diagrams list from plugin configuration XML.");
-            e.printStackTrace();
-        }
 
-        try {
-            dbFactory = DocumentBuilderFactory.newInstance();
-            dBuilder = dbFactory.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
+            try {
+                // Retrieve list of included and excluded diagrams' IDs
+                NodeList diagramNodeList = doc.getElementsByTagName("diagramID");
+                for (int i = 0; i < diagramNodeList.getLength(); i++) {
+                    Node diagramNode = diagramNodeList.item(i);
+                    if (diagramNode.getNodeType() == Node.ELEMENT_NODE) {
+                        Element diagramElement = (Element) diagramNode;
+                        includedDiagrams.add(diagramElement.getTextContent());
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("Error retrieving included/excluded diagrams list from plugin configuration XML.");
+                Application.getInstance().getGUILog().showError("Error retrieving included/excluded diagrams list from plugin configuration XML.");
+                e.printStackTrace();
+            }
         }
 
         includesList.setCellRenderer(new DiagramPresentationElementListCellRender());
@@ -176,7 +174,7 @@ public class ConfigurationPopupMenu extends JFrame {
             }
         });
         removeButton.addActionListener((ActionEvent e) -> {
-            emailListModel.removeElement(emailList.getSelectedIndex());
+            emailListModel.remove(emailList.getSelectedIndex());
         });
 
         includeSingleButton.addActionListener((ActionEvent e) -> {
@@ -205,7 +203,11 @@ public class ConfigurationPopupMenu extends JFrame {
         okButton.addActionListener((ActionEvent e) -> {
             included = includesListModel.toArray();
             emails = emailListModel.toArray();
-            url = urlInputField.getText();
+            String currentURL = urlInputField.getText();
+            if (currentURL.equals(this.url) == false) {
+                createDrive(currentURL);
+            }
+            this.url = currentURL;
             generateXML();
         });
         cancelButton.addActionListener((ActionEvent e) -> this.dispose());
@@ -225,14 +227,6 @@ public class ConfigurationPopupMenu extends JFrame {
      * adding new diagramIDs for the newly included diagramsIDs
      */
     private void generateXML() {
-        // TODO: Include the information from the URL inputfield and the email list in the XML.
-        // The inputfield has the sysmldiagrams subsite URL as its default unless there is a value in the XML file to
-        // overwrite it. So, you can always depend on just grabbing whatever's in the inputfield as the new URL for the
-        // XML file. We'll have to put in a check at some point if it's an invalid URL.
-        // As for the email list, you can get an array of its Strings with emailListModel.toArray(). Add those to the XML
-        // under a single node, and concatenate them into one string separated by semicolons.
-        // Once those're written to the XML, I can get to work on reading in their values throughout the plugin.
-
         try {
             // Set up file and doc builder
             File fXmlFile = new File("resources/" + project.getName() + "config.xml");
@@ -257,7 +251,7 @@ public class ConfigurationPopupMenu extends JFrame {
                     emailStringBuilder.append(";");
                 }
                 emailElement.setTextContent(emailStringBuilder.toString());
-                urlElement.setTextContent(url);
+                urlElement.setTextContent(this.url);
             }
 
             // Pushes changes to file
@@ -348,6 +342,56 @@ public class ConfigurationPopupMenu extends JFrame {
                 StreamResult result = new StreamResult(file.getAbsolutePath());
                 transformer.transform(source, result);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createDrive(String networkLocation) {
+        createDrive("S", networkLocation);
+    }
+
+    /**
+     * Creates a network drive connecting sandbox to computer.
+     * TODO: Add user input for networkLocation
+     *
+     * @param driveLetter location of folder being saved to, has drive for first
+     *                two characters and proper path to file
+     */
+    private static void createDrive(String driveLetter, String networkLocation) {
+        // Grabs the first two letters of diagramsDirectory
+        File drive = new File(driveLetter + ":");
+        // If the given drive doesn't already exist, if it does just continue
+        if (drive.exists()) {
+            System.out.println("Drive Found");
+            try {
+                String command = "c:\\windows\\system32\\net.exe use " +
+                        drive + " /delete";
+                // Create a process for connecting and wait for it to finish
+                Process p = Runtime.getRuntime().exec(command);
+                System.out.println("Connecting new network drive...");
+                p.waitFor();
+                boolean success = p.exitValue() == 0;
+                p.destroy();
+                System.out.println("Deletion " + (success ? "Successful!" :
+                        "Failed."));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        // Try connecting it to the given networkLocation
+        try {
+            String command = "c:\\windows\\system32\\net.exe use " +
+                    drive + " " + networkLocation;
+            System.out.println(command);
+            // Create a process for connecting and wait for it to finish
+            Process p = Runtime.getRuntime().exec(command);
+            System.out.println("Connecting new network drive...");
+            p.waitFor();
+            boolean success = p.exitValue() == 0;
+            p.destroy();
+            System.out.println("Connection " + (success ? "Successful!" :
+                    "Failed."));
         } catch (Exception e) {
             e.printStackTrace();
         }
