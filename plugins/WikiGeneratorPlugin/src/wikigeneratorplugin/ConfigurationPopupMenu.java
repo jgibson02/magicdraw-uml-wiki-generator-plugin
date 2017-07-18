@@ -33,6 +33,8 @@ import java.util.LinkedList;
  */
 public class ConfigurationPopupMenu extends JFrame {
 
+    private String url;
+    private Object[] emails;
     private Object[] included;
     private DocumentBuilderFactory dbFactory;
     private DocumentBuilder dBuilder;
@@ -159,13 +161,14 @@ public class ConfigurationPopupMenu extends JFrame {
                 includesListModel.removeElement(o);
             }
         });
+
         okButton.addActionListener((ActionEvent e) -> {
             included = includesListModel.toArray();
+            emails = emailListModel.toArray();
+            url = urlInputField.getText();
             generateXML();
         });
-        cancelButton.addActionListener((ActionEvent e) -> {
-            this.dispose();
-        });
+        cancelButton.addActionListener((ActionEvent e) -> this.dispose());
 
         this.add(rootPanel);
         this.setLocationRelativeTo(null);
@@ -203,31 +206,19 @@ public class ConfigurationPopupMenu extends JFrame {
             // parse doc from the include element
             doc.getDocumentElement().normalize();
             Node includeElement = doc.getElementsByTagName("include").item(0);
+            Node emailElement = doc.getElementsByTagName("emails").item(0);
+            Node urlElement = doc.getElementsByTagName("url").item(0);
             if (includeElement == null) {
                 System.out.println("Includes list from user's project configuration XML does not exist. Check plugin's resources directory.");
             } else {
-                // Removes all previous diagramIDs
-                if (includeElement.getNodeType() == Node.ELEMENT_NODE) {
-                    NodeList nList = doc.getElementsByTagName("diagramID");
-                    for (int temp = 0; temp < nList.getLength(); temp++) {
-                        Node nNode = nList.item(temp);
-                        if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-                            includeElement.removeChild(nNode);
-                        }
-                    }
+                updateIncludes(includeElement);
+                StringBuilder emailStringBuilder = new StringBuilder("");
+                for (Object email : emails) {
+                    emailStringBuilder.append(email.toString());
+                    emailStringBuilder.append(";");
                 }
-                // Adds new ones from selected list
-                for (Object dpeObj : included) {
-                    if (dpeObj instanceof DiagramPresentationElement) {
-                        DiagramPresentationElement dpe =
-                                (DiagramPresentationElement) dpeObj;
-                        Element diagramID = doc.createElement("diagramID");
-                        diagramID.appendChild(doc.createTextNode(dpe.getDiagram().getID()));
-                        if (includeElement.getNodeType() == Node.ELEMENT_NODE) {
-                            includeElement.appendChild(diagramID);
-                        }
-                    }
-                }
+                emailElement.setTextContent(emailStringBuilder.toString());
+                urlElement.setTextContent(url);
             }
 
             // Pushes changes to file
@@ -243,6 +234,32 @@ public class ConfigurationPopupMenu extends JFrame {
             e.printStackTrace();
         }
     }
+    
+    private void updateIncludes(Node includeElement){
+        // Removes all previous diagramIDs
+        if (includeElement.getNodeType() == Node.ELEMENT_NODE) {
+            NodeList nList = doc.getElementsByTagName("diagramID");
+            for (int temp = 0; temp < nList.getLength(); temp++) {
+                Node nNode = nList.item(temp);
+                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                    includeElement.removeChild(nNode);
+                }
+            }
+        }
+        // Adds new ones from selected list
+        for (Object dpeObj : included) {
+            if (dpeObj instanceof DiagramPresentationElement) {
+                DiagramPresentationElement dpe =
+                        (DiagramPresentationElement) dpeObj;
+                Element diagramID = doc.createElement("diagramID");
+                diagramID.appendChild(doc.createTextNode(dpe.getDiagram().getID()));
+                if (includeElement.getNodeType() == Node.ELEMENT_NODE) {
+                    includeElement.appendChild(diagramID);
+                }
+            }
+        }
+    }
+
 
     /**
      * Creates a new XML file that has the basic structure of a project XML
@@ -277,6 +294,10 @@ public class ConfigurationPopupMenu extends JFrame {
             // Add include and colors element under settings element
             Element include = doc.createElement("include");
             Element colors = doc.createElement("colors");
+            Element emails = doc.createElement("emails");
+            Element url = doc.createElement("url");
+            settings.appendChild(url);
+            settings.appendChild(emails);
             settings.appendChild(include);
             settings.appendChild(colors);
 
