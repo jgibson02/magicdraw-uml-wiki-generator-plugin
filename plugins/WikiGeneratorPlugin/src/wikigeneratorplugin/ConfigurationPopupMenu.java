@@ -75,26 +75,69 @@ public class ConfigurationPopupMenu extends JFrame {
         DiagramPresentationElement[] dpes = dpesCollection.toArray(new DiagramPresentationElement[dpesCollection.size()]);
         included = dpes;
 
-        // Retrieve list of included diagram names from XML file
-        LinkedList<String> includedDiagrams = new LinkedList<String>();
         try {
             File fXmlFile = new File("resources/" + project.getName() + "config.xml");
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(fXmlFile);
-            doc.getDocumentElement().normalize();
+            this.doc = dBuilder.parse(fXmlFile);
+            this.doc.getDocumentElement().normalize();
+        } catch (Exception e) {
+            System.err.println("Error parsing plugin configuration XML file.");
+            e.printStackTrace();
+        }
 
-            NodeList nList = doc.getElementsByTagName("diagramID");
-            for (int temp = 0; temp < nList.getLength(); temp++) {
-                Node nNode = nList.item(temp);
-                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-                    Element eElement = (Element) nNode;
-                    includedDiagrams.add(eElement.getTextContent());
+        // Retrieve user settings from XML file
+        LinkedList<String> includedDiagrams = new LinkedList<String>();
+        String emailRecipients = null;
+        excludesListModel = new DefaultListModel<>();
+        includesListModel = new DefaultListModel<>();
+        emailListModel = new DefaultListModel<>();
+        try {
+            // Update URL input field with value from XML
+            String spSiteURL = doc.getElementsByTagName("url").item(0).getTextContent(); // There should only be 1 <url> element
+            urlInputField.setText(spSiteURL);
+        } catch(Exception e) {
+            System.err.println("Error retrieving SharePoint site URL from plugin configuration XML.");
+            Application.getInstance().getGUILog().showError("Error retrieving SharePoint site URL from plugin configuration XML.");
+            e.printStackTrace();
+        }
+
+        try {
+            // Retrieve list of email recipients
+            NodeList emailNodeList = doc.getElementsByTagName("emails");
+            boolean hasEmails = emailNodeList.getLength() > 0;
+            System.out.println("\n======== Email Recipients ========");
+            if (hasEmails) {
+                String dsvEmailList = emailNodeList.item(0).getTextContent(); // There should only be 1 <emails> element
+                this.emails = dsvEmailList.split(";");
+                for (Object email : emails) {
+                    System.out.println((String) email);
+                    emailListModel.addElement((String) email);
+                }
+            } else {
+                System.out.println("No emails found.");
+            }
+            System.out.println("\n==================================");
+        } catch (Exception e) {
+            System.err.println("Error retrieving email recipients list from plugin configuration XML.");
+            Application.getInstance().getGUILog().showError("Error retrieving email recipients list from plugin configuration XML.");
+            e.printStackTrace();
+        }
+
+        try {
+            // Retrieve list of included and excluded diagrams' IDs
+            NodeList diagramNodeList = doc.getElementsByTagName("diagramID");
+            for (int i = 0; i < diagramNodeList.getLength(); i++) {
+                Node diagramNode = diagramNodeList.item(i);
+                if (diagramNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element diagramElement = (Element) diagramNode;
+                    includedDiagrams.add(diagramElement.getTextContent());
                 }
             }
         } catch (Exception e) {
+            System.err.println("Error retrieving included/excluded diagrams list from plugin configuration XML.");
+            Application.getInstance().getGUILog().showError("Error retrieving included/excluded diagrams list from plugin configuration XML.");
             e.printStackTrace();
-            Application.getInstance().getGUILog().showError("Error Occurred");
         }
 
         try {
@@ -106,8 +149,7 @@ public class ConfigurationPopupMenu extends JFrame {
 
         includesList.setCellRenderer(new DiagramPresentationElementListCellRender());
         excludesList.setCellRenderer(new DiagramPresentationElementListCellRender());
-        excludesListModel = new DefaultListModel<>();
-        includesListModel = new DefaultListModel<>();
+
         StringBuilder includedDiagramsList = new StringBuilder("\n======== Included Diagrams ========\n");
         for (DiagramPresentationElement dpe : dpes) {
             boolean isInIncludedDiagrams = false;
@@ -123,10 +165,8 @@ public class ConfigurationPopupMenu extends JFrame {
             }
         }
         System.out.println(includedDiagramsList.toString() + "===================================");
-        includesList.setModel(excludesListModel);
-        excludesList.setModel(includesListModel);
-
-        emailListModel = new DefaultListModel<>();
+        includesList.setModel(includesListModel);
+        excludesList.setModel(excludesListModel);
         emailList.setModel(emailListModel);
 
         addButton.addActionListener((ActionEvent e) -> {
@@ -140,12 +180,12 @@ public class ConfigurationPopupMenu extends JFrame {
         });
 
         includeSingleButton.addActionListener((ActionEvent e) -> {
-            DiagramPresentationElement dpe = (DiagramPresentationElement) includesList.getSelectedValue();
+            DiagramPresentationElement dpe = (DiagramPresentationElement) excludesList.getSelectedValue();
             includesListModel.addElement(dpe);
             excludesListModel.removeElement(dpe);
         });
         excludeSingleButton.addActionListener((ActionEvent e) -> {
-            DiagramPresentationElement dpe = (DiagramPresentationElement) excludesList.getSelectedValue();
+            DiagramPresentationElement dpe = (DiagramPresentationElement) includesList.getSelectedValue();
             excludesListModel.addElement(dpe);
             includesListModel.removeElement(dpe);
         });
@@ -195,8 +235,7 @@ public class ConfigurationPopupMenu extends JFrame {
 
         try {
             // Set up file and doc builder
-            File fXmlFile = new File
-                    ("resources/" + project.getName() + "config.xml");
+            File fXmlFile = new File("resources/" + project.getName() + "config.xml");
             // If the file doesn't already exist, create it
             if (!fXmlFile.exists()) {
                 createNewXML(fXmlFile);

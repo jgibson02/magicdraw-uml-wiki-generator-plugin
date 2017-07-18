@@ -44,6 +44,7 @@ public class ProjectListener implements ProjectEventListener {
     private HashSet<DiagramPresentationElement> dirtyDiagrams;
     private LinkedList<String> includedDiagrams; // List of diagram IDs for diagrams specified as included in the XML
     private String diagramsDirectory; // S:\SitePages\PROJECTNAME\diagrams
+    private String spSiteURL;
 
     /**
      * Initializes collections.
@@ -51,6 +52,7 @@ public class ProjectListener implements ProjectEventListener {
     ProjectListener() {
         this.dirtyDiagrams = new HashSet<>();
         this.includedDiagrams = new LinkedList<>();
+        this.spSiteURL = null;
     }
 
     @Override
@@ -91,15 +93,17 @@ public class ProjectListener implements ProjectEventListener {
             Document doc = dBuilder.parse(fXmlFile);
             doc.getDocumentElement().normalize();
 
-            NodeList nList = doc.getElementsByTagName("diagramID");
-            for (int temp = 0; temp < nList.getLength(); temp++) {
-                Node nNode = nList.item(temp);
-                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-                    Element eElement = (Element) nNode;
-                    System.out.println(eElement.getTextContent());
-                    includedDiagrams.add(eElement.getTextContent());
+            NodeList diagramNodeList = doc.getElementsByTagName("diagramID");
+            for (int temp = 0; temp < diagramNodeList.getLength(); temp++) {
+                Node diagramNode = diagramNodeList.item(temp);
+                if (diagramNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element diagramElement = (Element) diagramNode;
+                    includedDiagrams.add(diagramElement.getTextContent());
                 }
             }
+
+            this.spSiteURL = doc.getElementById("url").getTextContent();
+
         } catch (Exception e) {
             e.printStackTrace();
             Application.getInstance().getGUILog().showError("Error Occurred");
@@ -275,7 +279,7 @@ public class ProjectListener implements ProjectEventListener {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(htmlFile))) {
                 writer.write(htmlBuilder.toString().replace("{{PROJECT_NAME}}", project.getName()));
                 if (openWikiPage)
-                    Desktop.getDesktop().browse(URI.create("https://larced.spstg.jsc.nasa.gov/sites/EDM/seemb/sysmldiagram/SitePages/" + project.getName() + "/" + project.getName() + "_diagrams.html"));
+                    Desktop.getDesktop().browse(URI.create(spSiteURL + "/SitePages/" + project.getName() + "/" + project.getName() + "_diagrams.html"));
             } catch (IOException e) {
                 System.out.println("Error writing HTML to SharePoint:");
                 e.printStackTrace();
@@ -368,7 +372,7 @@ public class ProjectListener implements ProjectEventListener {
      *                two characters and proper path to file
      */
     private void createDrive(String fileLoc) {
-        createDrive(fileLoc, "https://larced.spstg.jsc.nasa.gov/sites/EDM/seemb/sysmldiagram");
+        createDrive(fileLoc, this.spSiteURL);
     }
 
     /**
