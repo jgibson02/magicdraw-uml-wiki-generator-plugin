@@ -267,7 +267,7 @@ public class ConfigurationPopupMenu extends JFrame {
             e.printStackTrace();
         }
     }
-    
+
     private void updateIncludes(Node includeElement){
         // Removes all previous diagramIDs
         if (includeElement.getNodeType() == Node.ELEMENT_NODE) {

@@ -154,7 +154,7 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/plugins/All Plugins/All Plugins.iml" filepath="$PROJECT_DIR$/plugins/All Plugins/All Plugins.iml" />
+      <module fileurl="file://C:\Users\jhgibso1\Documents\GitHub\UMLWikiGenerator\plugins\All Plugins\All Plugins.iml" filepath="C:\Users\jhgibso1\Documents\GitHub\UMLWikiGenerator\plugins\All Plugins\All Plugins.iml" />
       <module fileurl="file://$PROJECT_DIR$/plugins/WikiGeneratorPlugin/WikiGeneratorPlugin.iml" filepath="$PROJECT_DIR$/plugins/WikiGeneratorPlugin/WikiGeneratorPlugin.iml" />
     </modules>
   </component>
@@ -230,19 +230,17 @@
     <library name="MagicDraw">
       <CLASSES>
         <root url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/lib" />
+        <root url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/lib/graphics" />
+        <root url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/lib/webservice" />
       </CLASSES>
       <JAVADOC>
         <root url="jar://$MAGIC_DRAW_INSTALL_DIRECTORY$/openapi/docs/javadoc.zip!/" />
+        <root url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/openapi/docs" />
       </JAVADOC>
       <SOURCES />
-      <jarDirectory url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/lib" recursive="true" />
-    </library>
-    <library name="SharePoint">
-      <CLASSES />
-      <JAVADOC />
-      <SOURCES>
-        <root url="jar://$USER_HOME$/Downloads/jtip-sharepoint-src.zip!/SharePointTest/src" />
-      </SOURCES>
+      <jarDirectory url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/lib" recursive="false" />
+      <jarDirectory url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/lib/graphics" recursive="false" />
+      <jarDirectory url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/lib/webservice" recursive="false" />
     </library>
   </component>
 </project>

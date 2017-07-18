@@ -19,26 +19,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="MagicDraw" level="project" />
-    <orderEntry type="library" exported="" name="SharePoint" level="project" />
-    <orderEntry type="module-library" exported="">
-      <library name="Sp1">
-        <CLASSES />
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/Downloads/jtip-sharepoint-src.zip!/SharePointTest/src" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" exported="">
-      <library name="sp2">
-        <CLASSES />
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/Downloads/java-sharepoint-library-master.zip!/java-sharepoint-library-master/src/main/java" />
-          <root url="jar://$USER_HOME$/Downloads/java-sharepoint-library-master.zip!/java-sharepoint-library-master/src/test/java" />
-        </SOURCES>
-      </library>
-    </orderEntry>
     <orderEntry type="library" name="javax.json-api-1.0" level="project" />
   </component>
 </module>
