@@ -2,6 +2,7 @@ package wikigeneratorplugin;
 
 import com.nomagic.actions.NMAction;
 import com.nomagic.magicdraw.actions.MDAction;
+import com.nomagic.magicdraw.core.Application;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -36,5 +37,11 @@ public class ToolsMenuAction extends MDAction {
     public void actionPerformed(ActionEvent e)
     {
         new ConfigurationPopupMenu();
+    }
+
+    @Override
+    public void updateState() {
+        setEnabled(Application.getInstance()
+                .getProject() != null);
     }
 }
