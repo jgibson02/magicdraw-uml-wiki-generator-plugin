@@ -61,7 +61,7 @@ public class ConfigurationPopupMenu extends JFrame {
     private JLabel excludesListLabel;
     private JPanel rootPanel;
     private JPanel confirmationButtonsPanel;
-    private JComboBox driveLetterDropdown;
+    private JComboBox driveNameDropdown;
 
     //==========================================================================
     // CONSTRUCTOR FUNCTIONS
@@ -329,6 +329,8 @@ public class ConfigurationPopupMenu extends JFrame {
             Element colors = doc.createElement("colors");
             Element emails = doc.createElement("emails");
             Element url = doc.createElement("url");
+            Element driveName = doc.createElement("driveName");
+            settings.appendChild(driveName);
             settings.appendChild(url);
             settings.appendChild(emails);
             settings.appendChild(include);
@@ -355,12 +357,12 @@ public class ConfigurationPopupMenu extends JFrame {
      * Creates a network drive connecting sandbox to computer.
      * TODO: Add user input for networkLocation
      *
-     * @param driveLetter location of folder being saved to, has drive for first
+     * @param driveName location of folder being saved to, has drive for first
      *                two characters and proper path to file
      */
-    private static void createDrive(String driveLetter, String networkLocation) {
+    private static void createDrive(String driveName, String networkLocation) {
         // Grabs the first two letters of diagramsDirectory
-        File drive = new File(driveLetter + ":");
+        File drive = new File(driveName + ":");
         // If the given drive doesn't already exist, if it does just continue
         if (drive.exists()) {
             System.out.println("Drive Found");
