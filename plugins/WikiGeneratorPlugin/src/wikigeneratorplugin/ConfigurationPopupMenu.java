@@ -273,7 +273,43 @@ public class ConfigurationPopupMenu extends JFrame {
             e.printStackTrace();
         }
     }
-    
+
+    private void createDrive(String networkLocation) {
+        createDrive("S:", networkLocation);
+    }
+
+    /**
+     * Creates a network drive connecting sandbox to computer.
+     * TODO: Add user input for networkLocation
+     *
+     * @param driveName location of folder being saved to, has drive for first
+     *                two characters and proper path to file
+     */
+    private void createDrive(String driveName, String networkLocation) {
+        // Grabs the first two letters of diagramsDirectory
+        File drive = new File(driveName);
+        // If the given drive doesn't already exist, if it does just continue
+        if (!drive.exists()) {
+            // Try connecting it to the given networkLocation
+            try {
+                String command = "c:\\windows\\system32\\net.exe use " +
+                        drive + networkLocation;
+                // Create a process for connecting and wait for it to finish
+                Process p = Runtime.getRuntime().exec(command);
+                System.out.println("Connecting new network drive...");
+                p.waitFor();
+                boolean success = p.exitValue() == 0;
+                p.destroy();
+                System.out.println("Connection " + (success ? "Successful!" :
+                        "Failed."));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Drive Found");
+        }
+    }
+
     private void updateIncludes(Node includeElement){
         // Removes all previous diagramIDs
         if (includeElement.getNodeType() == Node.ELEMENT_NODE) {
