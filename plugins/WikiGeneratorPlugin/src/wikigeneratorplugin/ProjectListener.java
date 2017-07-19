@@ -2,7 +2,7 @@ package wikigeneratorplugin;
 
 import com.nomagic.magicdraw.core.Application;
 import com.nomagic.magicdraw.core.Project;
-import com.nomagic.magicdraw.core.project.ProjectEventListener;
+import com.nomagic.magicdraw.core.project.ProjectEventListenerAdapter;
 import com.nomagic.magicdraw.export.image.ImageExporter;
 import com.nomagic.magicdraw.uml.ExtendedPropertyNames;
 import com.nomagic.magicdraw.uml.symbols.DiagramListenerAdapter;
@@ -39,7 +39,7 @@ import java.util.*;
  * SharePoint or not. The class uses the changes to the diagrams and the
  * projectconfig.xml to decide which files are uploaded to the SharePoint.
  */
-public class ProjectListener implements ProjectEventListener {
+public class ProjectListener extends ProjectEventListenerAdapter {
 
     private HashSet<DiagramPresentationElement> dirtyDiagrams;
     private LinkedList<String> includedDiagrams; // List of diagram IDs for diagrams specified as included in the XML
@@ -374,34 +374,4 @@ public class ProjectListener implements ProjectEventListener {
             System.out.println("======== Beginning Diagrams Export ========");
         }
     }
-
-    //============================================================
-    // Unused Abstract Methods
-    //============================================================
-    @Override
-    public void projectClosed(Project project) {}
-    @Override
-    public void projectActivated(Project project) {}
-    @Override
-    public void projectDeActivated(Project project) {}
-    @Override
-    public void projectReplaced(Project project, Project project1) {}
-    @Override
-    public void projectCreated(Project project) {}
-    @Override
-    public void projectPreClosed(Project project) {}
-    @Override
-    public void projectPreClosedFinal(Project project) {}
-    @Override
-    public void projectPreSaved(Project project, boolean b) {}
-    @Override
-    public void projectPreActivated(Project project) {}
-    @Override
-    public void projectPreDeActivated(Project project) {}
-    @Override
-    public void projectPreReplaced(Project project, Project project1) {}
-    @Override
-    public void projectOpenedFromGUI(Project project) {}
-    @Override
-    public void projectActivatedFromGUI(Project project) {}
 }
