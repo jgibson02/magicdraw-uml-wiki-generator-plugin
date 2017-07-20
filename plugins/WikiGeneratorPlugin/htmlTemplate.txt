@@ -394,7 +394,7 @@
                             <td><input type="checkbox" name="ibd-check" checked="checked" /></td>
                         </tr>
                         <tr>
-                            <td>Doc Tree/Organization</td>
+                            <td>Doc Tree/Organization (pkg)</td>
 							<td id="pkg-count" class="tally-count"></td>
                             <td><input type="checkbox" name="pkg-check" checked="checked" /></td>
                         </tr>
@@ -409,7 +409,7 @@
                             <td><input type="checkbox" name="req-check" checked="checked" /></td>
                         </tr>
                         <tr>
-                            <td>Interaction/System Behavior</td>
+                            <td>Interaction/System Behavior (sd, stm)</td>
 							<td id="sd-stm-count" class="tally-count"></td>
                             <td><input type="checkbox" name="sd-stm-check" checked="checked" /></td>
                         </tr>
