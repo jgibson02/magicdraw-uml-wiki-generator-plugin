@@ -29,7 +29,7 @@ import java.util.LinkedList;
 /**
  * Author: Kareem Abdol-Hamid kkabdolh
  * Version: 6/29/2017
- *
+ * <p>
  * This class is used to generate a popup menu in MagicDraw for the user to
  * interact with, it allows the user to choose which diagrams they want to
  * include in  their SharePoint upload
@@ -110,7 +110,7 @@ public class ConfigurationPopupMenu extends JFrame {
                 // Retrieve SharePoint site URL from XML file
                 String spSiteURL = doc.getElementsByTagName("url").item(0).getTextContent(); // There should only be 1 <url> element
                 urlInputField.setText(spSiteURL);
-            } catch(Exception e) {
+            } catch (Exception e) {
                 System.err.println("Error retrieving SharePoint site URL from plugin configuration XML.");
                 Application.getInstance().getGUILog().showError("Error retrieving SharePoint site URL from plugin configuration XML.");
                 e.printStackTrace();
@@ -282,6 +282,7 @@ public class ConfigurationPopupMenu extends JFrame {
      */
     private void generateXML() {
         try {
+            System.out.println("Do we get here");
             // Set up file and doc builder
             File fXmlFile = new File("resources/" + project.getName() + "config.xml");
             // If the file doesn't already exist, create it
@@ -299,6 +300,7 @@ public class ConfigurationPopupMenu extends JFrame {
             if (includeElement == null) {
                 System.out.println("Includes list from user's project configuration XML does not exist. Check plugin's resources directory.");
             } else {
+                System.out.println("Do we get here1");
                 updateIncludes(includeElement);
                 StringBuilder emailStringBuilder = new StringBuilder("");
                 for (Object email : emails) {
@@ -324,17 +326,11 @@ public class ConfigurationPopupMenu extends JFrame {
         }
     }
 
-    private void updateIncludes(Node includeElement){
+    private void updateIncludes(Node includeElement) {
+        System.out.println("Do we get here2");
         // Removes all previous diagramIDs
-        if (includeElement.getNodeType() == Node.ELEMENT_NODE) {
-            NodeList nList = doc.getElementsByTagName("diagramID");
-            for (int temp = 0; temp < nList.getLength(); temp++) {
-                Node nNode = nList.item(temp);
-                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-                    includeElement.removeChild(nNode);
-                }
-            }
-        }
+        doc.getElementsByTagName("include").item(0).setTextContent("");
+
         // Adds new ones from selected list
         for (Object dpeObj : included) {
             if (dpeObj instanceof DiagramPresentationElement) {
@@ -354,18 +350,19 @@ public class ConfigurationPopupMenu extends JFrame {
      * Creates a new XML file that has the basic structure of a project XML
      * for this plugin.
      * Example:
-     *  <plugin>
-     *      <settings>
-     *          <include>
+     * <plugin>
+     * <settings>
+     * <include>
+     * <p>
+     * </include>
+     * <colors>
+     * <p>
+     * </colors>
+     * </settings>
+     * </plugin>
+     * <p>
+     * This basic outline is generated with the name of the file given
      *
-     *          </include>
-     *          <colors>
-     *
-     *          </colors>
-     *      </settings>
-     *  </plugin>
-     *
-     *  This basic outline is generated with the name of the file given
      * @param file file that will be used to generate
      */
     private void createNewXML(File file) {
@@ -415,7 +412,7 @@ public class ConfigurationPopupMenu extends JFrame {
      * TODO: Add user input for networkLocation
      *
      * @param driveLetter location of folder being saved to, has drive for first
-     *                two characters and proper path to file
+     *                    two characters and proper path to file
      */
     private static void createDrive(char driveLetter, String networkLocation) {
         // Grabs the first two letters of diagramsDirectory

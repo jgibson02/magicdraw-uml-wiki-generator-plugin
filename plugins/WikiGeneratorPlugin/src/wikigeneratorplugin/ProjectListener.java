@@ -33,7 +33,7 @@ import java.util.*;
 /**
  * Author: Kareem Abdol-Hamid kkabdolh
  * Version: 6/27/2017
- *
+ * <p>
  * This responds anytime a MagicDraw project with this plugin installed is
  * saved. It will ask the user if they want to upload their changes to
  * SharePoint or not. The class uses the changes to the diagrams and the
@@ -41,33 +41,39 @@ import java.util.*;
  */
 public class ProjectListener extends ProjectEventListenerAdapter {
 
-    private HashSet<DiagramPresentationElement> dirtyDiagrams;
+    private Project project;
+    private HashMap<DiagramPresentationElement, Status> dirtyDiagrams;
     private LinkedList<String> includedDiagrams; // List of diagram IDs for diagrams specified as included in the XML
     private String diagramsDirectory; // S:\SitePages\PROJECTNAME\diagrams
     private String spSiteURL;
     private String dsvEmailRecipients;
+    private LinkedList<String> removedDiagrams;
 
     /**
      * Initializes collections.
      */
     ProjectListener() {
-        this.dirtyDiagrams = new HashSet<>();
+        this.dirtyDiagrams = new HashMap<>();
         this.includedDiagrams = new LinkedList<>();
+        this.removedDiagrams = new LinkedList<>();
         this.spSiteURL = null;
         this.dsvEmailRecipients = null;
+        this.project = null;
     }
 
     @Override
     public void projectOpened(final Project project) {
+        this.project = project;
         this.diagramsDirectory = "s:\\SitePages\\" + project.getName() + "\\diagrams\\";
         Application.getInstance().getProjectsManager().addProjectListener(this);
         DiagramListenerAdapter adapter = new DiagramListenerAdapter(new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 String propertyName = evt.getPropertyName();
-                if(propertyName.equals(ExtendedPropertyNames.VIEW_UPDATED)) {
-                    DiagramFrameView diagramFrameView = (DiagramFrameView) evt.getNewValue();
-                    dirtyDiagrams.add(diagramFrameView.getDiagramPresentationElement());
+                System.out.println("Event being fired: " + evt
+                        .getPropertyName());
+                if (propertyName.equals(ExtendedPropertyNames.BOUNDS)) {
+                    dirtyDiagrams.put(project.getActiveDiagram(), Status.UPDATED);
                 }
             }
         });
@@ -80,8 +86,9 @@ public class ProjectListener extends ProjectEventListenerAdapter {
      * upload. If yet, it will continue forward and upload all files that
      * have been changed or added (that are in included) and remove all
      * diagrams that are no longer in included or no longer exist.
+     *
      * @param project: the MagicDraw project currently loaded
-     * @param b: true if the project was committed to a teamwork server
+     * @param b:       true if the project was committed to a teamwork server
      */
     @Override
     public void projectSaved(Project project, boolean b) {
@@ -148,7 +155,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                 // and they are in the included diagrams list
                 if (!(new File(diagramsDirectory + dpe.getDiagram().getName() +
                         ".svg")).exists() && includedDiagrams.contains(dpe.getDiagram().getID())) {
-                    dirtyDiagrams.add(dpe);
+                    dirtyDiagrams.put(dpe, Status.CREATED);
                 }
             }
             // Iterate over every .svg in project's folder, check if it is in
@@ -175,8 +182,10 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                     // Delete if not in included or diagram no longer exists
                     if (!isInDiagrams || !included) {
                         if (f.delete()) { // if deletion succeeds
-                            Application.getInstance().getGUILog().log("Deleting " + f.getName());
-                            System.out.print("Deleting " + f.getName());
+                            Application.getInstance().getGUILog().log
+                                    ("Removing" + f.getName());
+                            removedDiagrams.add(f.getName());
+                            System.out.print("Removing " + f.getName());
                         }
                     }
                 }
@@ -189,7 +198,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
 
             // Go to export then clear dirty diagrams list
             exportDiagrams(project, dirtyDiagrams, diagramsDirectory);
-            dirtyDiagrams.clear();
+
 
             /*
             // Create JSON object of project and diagram data.
@@ -309,7 +318,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
 
             if (sendEmail) {
                 try {
-                    Desktop.getDesktop().browse(URI.create("mailto:"+dsvEmailRecipients));
+                    Desktop.getDesktop().browse(URI.create(constructEmail()));
                 } catch (IOException e) {
                     Application.getInstance().getGUILog().showError("Could not create email for recipients: " + e.getMessage());
                     e.printStackTrace();
@@ -331,13 +340,18 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             }
             */
         } // if (dialogResponse == JOptionPane.YES_OPTION)
+        dirtyDiagrams.clear();
+        removedDiagrams.clear();
     }
+
 
     //===================================================
     // Private Methods
     //===================================================
 
-    private void exportDiagrams(Project project, Collection<DiagramPresentationElement> dirtyDiagrams, String fileLoc) {
+    private void exportDiagrams(Project project,
+                                HashMap<DiagramPresentationElement, Status>
+                                        dirtyDiagrams, String fileLoc) {
         int count = 0;
         int total = dirtyDiagrams.size();
         if (total == 0) {
@@ -349,7 +363,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             System.out.println("0% Complete");
             Application.getInstance().getGUILog().log("Diagrams to export: " + total, true);
             Application.getInstance().getGUILog().log("0% Complete", true);
-            for (DiagramPresentationElement dpe : dirtyDiagrams) {
+            for (DiagramPresentationElement dpe : dirtyDiagrams.keySet()) {
                 if (dpe != null) {
                     count++;
                     File SVGFileLocation = new File(fileLoc + '\\' + dpe.getDiagram().getName() + ".svg");
@@ -357,21 +371,52 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                     System.out.println("Exporting " + dpe.getDiagram().getName() + ".svg to " + SVGFileLocation.getAbsolutePath() + " (" + count + "/" + total + ")");
 
                     // This isn't actually multithreaded, MagicDraw is not thread-safe.
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                ImageExporter.export(dpe, ImageExporter.SVG, SVGFileLocation);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                    new Thread(() -> {
+                        try {
+                            ImageExporter.export(dpe, ImageExporter.SVG, SVGFileLocation);
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }).start();
                 } // End if-statement
                 Application.getInstance().getGUILog().log((int) Math.round((((double) count / (double) total) * 100)) + "% Complete", true);
                 System.out.println((int) Math.round(((count / (double) total) * 100)) + "% " + "Complete");
             } // End diagrams loop
-            System.out.println("======== Beginning Diagrams Export ========");
+            System.out.println("===============================");
         }
     }
+
+    private String constructEmail() {
+        StringBuilder email = new StringBuilder();
+        StringBuilder updated = new StringBuilder();
+        for (DiagramPresentationElement dpe : dirtyDiagrams.keySet()) {
+            System.out.println(dirtyDiagrams.get(dpe).getString());
+            switch (dirtyDiagrams.get(dpe)) {
+                case CREATED:
+                    email.append("  - " + dpe.getDiagram().getName() + "%0A");
+                    break;
+                case UPDATED:
+                    updated.append("  - " + dpe.getDiagram().getName() + "%0A");
+                    break;
+            }
+        }
+        if (updated.length() > 0) {
+            updated.insert(0,"UPDATED:%0A");
+        }
+        if (email.length() > 0) {
+            email.insert(0,"CREATED:%0A");
+        }
+        email.append(updated);
+        email.insert(0, "mailto:" + dsvEmailRecipients + "?subject=" + project
+                .getName() +"%20-%20Changelog&body=");
+        if (removedDiagrams.size() > 0) {
+            email.append("REMOVED:%0A");
+            for (String removed : removedDiagrams) {
+                email.append("  - " + removed.replace(".svg","") + "%0A");
+            }
+        }
+        System.out.println(email.toString());
+        return email.toString().replace(" ", "%20");
+    }
+
 }
