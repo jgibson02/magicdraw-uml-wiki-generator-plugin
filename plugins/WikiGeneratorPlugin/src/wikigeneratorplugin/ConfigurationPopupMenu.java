@@ -81,6 +81,7 @@ public class ConfigurationPopupMenu extends JFrame {
 
         project = Application.getInstance().getProject();
         doc = null;
+        driveLetter = 'S';
         Collection<DiagramPresentationElement> dpesCollection = Application.getInstance().getProject().getDiagrams();
         DiagramPresentationElement[] dpes = dpesCollection.toArray(new DiagramPresentationElement[dpesCollection.size()]);
         included = dpes;
