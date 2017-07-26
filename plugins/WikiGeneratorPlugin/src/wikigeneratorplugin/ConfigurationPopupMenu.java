@@ -12,14 +12,12 @@ import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +27,7 @@ import java.util.LinkedList;
 /**
  * Author: Kareem Abdol-Hamid kkabdolh
  * Version: 6/29/2017
- * <p>
+ *
  * This class is used to generate a popup menu in MagicDraw for the user to
  * interact with, it allows the user to choose which diagrams they want to
  * include in  their SharePoint upload
@@ -76,14 +74,17 @@ public class ConfigurationPopupMenu extends JFrame {
     // CONSTRUCTOR FUNCTIONS
     //==========================================================================
 
-    public ConfigurationPopupMenu() {
+    ConfigurationPopupMenu() {
         super("SharePoint Plugin Options");
 
         project = Application.getInstance().getProject();
         doc = null;
         driveLetter = 'S';
-        Collection<DiagramPresentationElement> dpesCollection = Application.getInstance().getProject().getDiagrams();
-        DiagramPresentationElement[] dpes = dpesCollection.toArray(new DiagramPresentationElement[dpesCollection.size()]);
+        DiagramPresentationElement[] dpes = new DiagramPresentationElement[0];
+        if (project != null) {
+            Collection<DiagramPresentationElement> dpesCollection = project.getDiagrams();
+            dpes = dpesCollection.toArray(new DiagramPresentationElement[dpesCollection.size()]);
+        }
         included = dpes;
 
         File fXmlFile = new File("resources/" + project.getName() + "config.xml");
@@ -239,12 +240,12 @@ public class ConfigurationPopupMenu extends JFrame {
 
             // Check for changes to URL or drive letter
             String currentDriveLetter = ((String) driveLetterDropdown.getSelectedItem()).substring(0, 1);
-            if (currentDriveLetter.equals(String.valueOf(this.driveLetter)) == false) {
+            if (!currentDriveLetter.equals(String.valueOf(this.driveLetter))) {
                 deleteNetworkDrive(new File(String.valueOf(this.driveLetter) + ":"));
             }
             this.driveLetter = currentDriveLetter.charAt(0);
             String currentURL = urlInputField.getText();
-            if (currentURL.equals(this.url) == false) {
+            if (!currentURL.equals(this.url)) {
                 createDrive(this.driveLetter, currentURL);
             }
             this.url = currentURL;

@@ -9,6 +9,8 @@ import com.nomagic.magicdraw.actions.MDAction;
 /**
  * Author: Kareem Abdol-Hamid kkabdolh
  * Version: 6/29/2017
+ *
+ * Adds action to the tools menu
  */
 public class ToolsMenuConfigurator implements AMConfigurator {
     /**
@@ -20,19 +22,18 @@ public class ToolsMenuConfigurator implements AMConfigurator {
      * Creates configurator.
      * @param action action to be added to main menu.
      */
-    public ToolsMenuConfigurator(MDAction action)
+    ToolsMenuConfigurator(MDAction action)
     {
         this.action = action;
     }
 
     /**
-     * @see com.nomagic.actions.AMConfigurator#configure(ActionsManager)
-     *  Methods adds action to given manager Help category
+     *  Methods adds action to given manager Tools category
      */
     @Override
     public void configure(ActionsManager manager)
     {
-        // searching for Help action category
+        // searching for Tools action category
         ActionsCategory category = (ActionsCategory) manager.getActionFor
                 (ActionsID.TOOLS);
         if( category != null)
@@ -41,6 +42,11 @@ public class ToolsMenuConfigurator implements AMConfigurator {
             category.addAction(action);
         }
     }
+
+    /**
+     * Set default property
+     * @return MEDIUM_PRIORITY
+     */
     @Override
     public int getPriority()
     {
