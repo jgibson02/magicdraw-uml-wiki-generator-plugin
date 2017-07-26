@@ -7,22 +7,17 @@ import com.nomagic.magicdraw.export.image.ImageExporter;
 import com.nomagic.magicdraw.uml.ExtendedPropertyNames;
 import com.nomagic.magicdraw.uml.symbols.DiagramListenerAdapter;
 import com.nomagic.magicdraw.uml.symbols.DiagramPresentationElement;
-import com.nomagic.magicdraw.uml.symbols.shapes.DiagramFrameView;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.json.*;
 import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.awt.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -33,7 +28,7 @@ import java.util.*;
 /**
  * Author: Kareem Abdol-Hamid kkabdolh
  * Version: 6/27/2017
- * <p>
+ *
  * This responds anytime a MagicDraw project with this plugin installed is
  * saved. It will ask the user if they want to upload their changes to
  * SharePoint or not. The class uses the changes to the diagrams and the
@@ -195,18 +190,40 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             // Go to export then clear dirty diagrams list
             exportDiagrams(project, dirtyDiagrams, diagramsDirectory);
 
-
-            /*
             // Create JSON object of project and diagram data.
             JsonBuilderFactory factory = Json.createBuilderFactory(null);
             JsonObject projectJsonObject;
             JsonObjectBuilder projectObjectBuilder = factory.createObjectBuilder()
                     .add("projectName", project.getName())
-                    .add("lastModified", "2013-01-13T12:54:09,186Z")
-                    .add("revision", 89)
-                    .add("lastUser", "nphojana");
-            JsonArrayBuilder diagramArrayBuilder = factory.createArrayBuilder();
-            */
+                    .add("lastModified", "2013-01-13T12:54:09,186Z");
+            JsonArrayBuilder diagramTypesArrayBuilder = factory.createArrayBuilder();
+            JsonObjectBuilder actObjectBuilder = factory.createObjectBuilder();
+                actObjectBuilder.add("title", "Process Flow/Flow Chart (act)");
+                JsonArrayBuilder actArrayBuilder = factory.createArrayBuilder();
+            JsonObjectBuilder bddObjectBuilder = factory.createObjectBuilder();
+                bddObjectBuilder.add("title", "Architecture/Decomposition (bdd)");
+                JsonArrayBuilder bddArrayBuilder = factory.createArrayBuilder();
+            JsonObjectBuilder ibdObjectBuilder = factory.createObjectBuilder();
+                ibdObjectBuilder.add("title", "Interface (ibd)");
+                JsonArrayBuilder ibdArrayBuilder = factory.createArrayBuilder();
+            JsonObjectBuilder pkgObjectBuilder = factory.createObjectBuilder();
+                pkgObjectBuilder.add("title", "Doc Tree/Organization (pkg)");
+                JsonArrayBuilder pkgArrayBuilder = factory.createArrayBuilder();
+            JsonObjectBuilder parObjectBuilder = factory.createObjectBuilder();
+                parObjectBuilder.add("title", "Parametric (par)");
+                JsonArrayBuilder parArrayBuilder = factory.createArrayBuilder();
+            JsonObjectBuilder reqObjectBuilder = factory.createObjectBuilder();
+                reqObjectBuilder.add("title", "Requirement (req)");
+                JsonArrayBuilder reqArrayBuilder = factory.createArrayBuilder();
+            JsonObjectBuilder sdstmObjectBuilder = factory.createObjectBuilder();
+                sdstmObjectBuilder.add("title", "Interaction/System Behavior (sd, stm)");
+                JsonArrayBuilder sdstmArrayBuilder = factory.createArrayBuilder();
+            JsonObjectBuilder ucObjectBuilder = factory.createObjectBuilder();
+                ucObjectBuilder.add("title", "Stakeholder Analysis (uc)");
+                JsonArrayBuilder ucArrayBuilder = factory.createArrayBuilder();
+            JsonObjectBuilder otherObjectBuilder = factory.createObjectBuilder();
+                otherObjectBuilder.add("title", "Other");
+                JsonArrayBuilder otherArrayBuilder = factory.createArrayBuilder();
 
             // Why use a templating engine when you have STRINGS
             String html = "";
@@ -227,52 +244,79 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                 // Test to see if diagram has an associated file
                 File SVGFileLocation = new File(diagramsDirectory + '\\' + diagramName + ".svg");
                 if (SVGFileLocation.exists()) {
-                    String url = "diagrams/" + diagramName + ".svg".replace(" ", "%20");
+                    String url = "diagrams/" + diagramName + ".svg".replace(" ", "%20"); // Kinda URL-encode the svg path
                     DateFormat df = new SimpleDateFormat("yyyy-MM-dd', 'HH:mm' UTC'");
                     df.setTimeZone(TimeZone.getTimeZone("UTC"));
                     String iso8601LastModified = df.format(new Date(SVGFileLocation.lastModified()));
                     String lastModifiedBy = System.getProperty("user.name");
                     String diagramType = dpe.getDiagramType().getType(), diagramClass = ".undefined";
+
+                    JsonObjectBuilder diagramObjectBuilder = factory.createObjectBuilder()
+                        .add("title", diagramName)
+                        .add("lastModified", iso8601LastModified)
+                        .add("lastModifiedBy", lastModifiedBy)
+                        .add("url", url);
+
                     switch (diagramType) {
                         case "SysML Activity Diagram":
                             diagramType = "Process Flow/Flow Chart (Activity Diagram)";
                             diagramClass = "act";
+                            diagramObjectBuilder.add("className", diagramClass);
+                            actArrayBuilder.add(diagramObjectBuilder.build());
                             break;
                         case "SysML Block Definition Diagram":
                             diagramType = "Architecture/Decomposition (Block Definition Diagram)";
                             diagramClass = "bdd";
+                            diagramObjectBuilder.add("className", diagramClass);
+                            bddArrayBuilder.add(diagramObjectBuilder.build());
                             break;
                         case "SysML Internal Block Diagram":
                             diagramType = "Interface (Internal Block Diagram)";
                             diagramClass = "ibd";
+                            diagramObjectBuilder.add("className", diagramClass);
+                            ibdArrayBuilder.add(diagramObjectBuilder.build());
                             break;
                         case "SysML Package Diagram":
                             diagramType = "Doc Tree/Organization (Package Diagram)";
                             diagramClass = "pkg";
+                            diagramObjectBuilder.add("className", diagramClass);
+                            pkgArrayBuilder.add(diagramObjectBuilder.build());
                             break;
                         case "SysML Parametric Diagram":
                             diagramType = "Parametric Diagram";
                             diagramClass = "par";
+                            diagramObjectBuilder.add("className", diagramClass);
+                            parArrayBuilder.add(diagramObjectBuilder.build());
                             break;
                         case "Requirement Diagram":
                             diagramClass = "req";
+                            diagramObjectBuilder.add("className", diagramClass);
+                            reqArrayBuilder.add(diagramObjectBuilder.build());
                             break;
                         case "SysML Sequence Diagram":
                             diagramType = "Interaction/System Behavior (Sequence Diagram)";
                             diagramClass = "sd";
+                            diagramObjectBuilder.add("className", diagramClass);
+                            sdstmArrayBuilder.add(diagramObjectBuilder.build());
                             break;
                         case "SysML State Machine Diagram":
                             diagramType = "Interaction/System Behavior (State Machine Diagram)";
                             diagramClass = "stm";
+                            diagramObjectBuilder.add("className", diagramClass);
+                            sdstmArrayBuilder.add(diagramObjectBuilder.build());
                             break;
                         case "SysML Use Case Diagram":
                             diagramType = "Stakeholder Analysis (Use Case Diagram)";
                             diagramClass = "uc";
+                            diagramObjectBuilder.add("className", diagramClass);
+                            ucArrayBuilder.add(diagramObjectBuilder.build());
                             break;
                         default:
                             diagramType += " (Other)";
                             diagramClass = "other";
-                    }
+                            diagramObjectBuilder.add("className", diagramClass);
+                            otherArrayBuilder.add(diagramObjectBuilder.build());
+                    } // switch (diagramType)
 
                     htmlBuilder.append("<div class=\"card diagram-card " + diagramClass + "\">" +
                             "<div class=\"card-block\">" +
@@ -284,20 +328,10 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                             "<img class=\"card-img-bottom\" src=\"" + url + "\">" +
                             "</a>" +
                             "</div>");
-
-                    /*
-                    diagramArrayBuilder.add(factory.createObjectBuilder()
-                            .add("name", diagramName)
-                            .add("lastModified", iso8601LastModified)
-                            .add("lastModifiedBy", lastModifiedBy)
-                            .add("url", url) // Sort of URL encode the svg path
-                            .build()
-                    );
-                    */
                 } else {
                     System.out.println(SVGFileLocation.getAbsolutePath() + " does not exist.");
-                }
-            }
+                } // if (SVGFileLocation.exists())
+            } // for (dpe)
 
             htmlBuilder.append("<h2 class=\"no-results-message\">No results found.</h2></div></div></div></body></html>");
 
@@ -323,10 +357,28 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                 }
             }
 
-            /*
-            projectObjectBuilder.add("diagrams", diagramArrayBuilder.build());
+            actObjectBuilder.add("children", actArrayBuilder.build());
+            bddObjectBuilder.add("children", bddArrayBuilder.build());
+            ibdObjectBuilder.add("children", ibdArrayBuilder.build());
+            pkgObjectBuilder.add("children", pkgArrayBuilder.build());
+            parObjectBuilder.add("children", parArrayBuilder.build());
+            reqObjectBuilder.add("children", reqArrayBuilder.build());
+            sdstmObjectBuilder.add("children", sdstmArrayBuilder.build());
+            ucObjectBuilder.add("children", ucArrayBuilder.build());
+            otherObjectBuilder.add("children", otherArrayBuilder.build());
+
+            diagramTypesArrayBuilder.add(actObjectBuilder.build());
+            diagramTypesArrayBuilder.add(bddObjectBuilder.build());
+            diagramTypesArrayBuilder.add(ibdObjectBuilder.build());
+            diagramTypesArrayBuilder.add(pkgObjectBuilder.build());
+            diagramTypesArrayBuilder.add(parObjectBuilder.build());
+            diagramTypesArrayBuilder.add(reqObjectBuilder.build());
+            diagramTypesArrayBuilder.add(sdstmObjectBuilder.build());
+            diagramTypesArrayBuilder.add(ucObjectBuilder.build());
+            diagramTypesArrayBuilder.add(otherObjectBuilder.build());
+            projectObjectBuilder.add("diagrams", diagramTypesArrayBuilder.build());
             projectJsonObject = projectObjectBuilder.build();
-            File jsonLocation = new File("s:\\SitePages\\"+project.getName()+"\\" + project.getName()+".json");
+            File jsonLocation = new File("s:\\SitePages\\"+project.getName()+"\\" + project.getName()+".txt");
             Application.getInstance().getGUILog().log("Writing project JSON to: " + jsonLocation.getAbsolutePath());
             System.out.println("Writing project JSON to: " + jsonLocation.getAbsolutePath());
             // Writes assembled JSON to disk.
@@ -336,7 +388,6 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                 Application.getInstance().getGUILog().showMessage(e.getMessage());
                 e.printStackTrace();
             }
-            */
         } // if (dialogResponse == JOptionPane.YES_OPTION)
         dirtyDiagrams.clear();
         removedDiagrams.clear();
