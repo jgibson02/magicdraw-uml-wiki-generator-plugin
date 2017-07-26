@@ -27,26 +27,35 @@ import java.util.LinkedList;
 /**
  * Author: Kareem Abdol-Hamid kkabdolh
  * Version: 6/29/2017
- *
+ * 
  * This class is used to generate a popup menu in MagicDraw for the user to
  * interact with, it allows the user to choose which diagrams they want to
  * include in  their SharePoint upload
  */
 public class ConfigurationPopupMenu extends JFrame {
 
+    //=== Current Working Project ===
+    private Project project;
+
+    //==== User inputs ======
     private String url;
     private char driveLetter;
     private Object[] emails;
     private Object[] included;
+
+    //======== Document Variables ========
     private DocumentBuilderFactory dbFactory;
     private DocumentBuilder dBuilder;
     private Document doc;
-    private Project project;
-    private JTextField urlInputField;
+
+    //============ Model Variables ===============
     private DefaultListModel<String> emailListModel;
     private DefaultListModel<DiagramPresentationElement> excludesListModel;
     private DefaultListModel<DiagramPresentationElement> includesListModel;
     private DefaultComboBoxModel<String> driveLetterDropdownModel;
+
+    //======= Swing Variables =========
+    private JTextField urlInputField;
     private JList emailList;
     private JList excludesList;
     private JList includesList;
@@ -71,7 +80,7 @@ public class ConfigurationPopupMenu extends JFrame {
     private JComboBox driveNameDropdown;
 
     //==========================================================================
-    // CONSTRUCTOR FUNCTIONS
+    // CONSTRUCTOR FUNCTION
     //==========================================================================
 
     ConfigurationPopupMenu() {
@@ -325,6 +334,12 @@ public class ConfigurationPopupMenu extends JFrame {
         }
     }
 
+    /**
+     * Updates the list of included elements by first clearing previous
+     * diagramIDs then going through list of included diagrams and adding them
+     *
+     * @param includeElement the element that new diagramIDs are appended to
+     */
     private void updateIncludes(Node includeElement) {
         // Removes all previous diagramIDs
         doc.getElementsByTagName("include").item(0).setTextContent("");
@@ -350,15 +365,10 @@ public class ConfigurationPopupMenu extends JFrame {
      * Example:
      * <plugin>
      * <settings>
-     * <include>
-     * <p>
-     * </include>
-     * <colors>
-     * <p>
-     * </colors>
+     * <include></include>
+     * <colors></colors>
      * </settings>
      * </plugin>
-     * <p>
      * This basic outline is generated with the name of the file given
      *
      * @param file file that will be used to generate
@@ -380,13 +390,11 @@ public class ConfigurationPopupMenu extends JFrame {
             Element driveLetter = doc.createElement("driveLetter");
             Element emails = doc.createElement("emails");
             Element include = doc.createElement("include");
-            Element colors = doc.createElement("colors");
 
             settings.appendChild(url);
             settings.appendChild(driveLetter);
             settings.appendChild(emails);
             settings.appendChild(include);
-            settings.appendChild(colors);
 
             // Save the doc as an xml with the given file parameter
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -401,13 +409,8 @@ public class ConfigurationPopupMenu extends JFrame {
         }
     }
 
-    private void createDrive(String networkLocation) {
-        createDrive('S', networkLocation);
-    }
-
     /**
      * Creates a network drive connecting sandbox to computer.
-     * TODO: Add user input for networkLocation
      *
      * @param driveLetter location of folder being saved to, has drive for first
      *                    two characters and proper path to file
@@ -437,6 +440,11 @@ public class ConfigurationPopupMenu extends JFrame {
         }
     }
 
+    /**
+     * Deletes old network drive when a new one is selected
+     *
+     * @param driveToDelete old network drive to be deleted
+     */
     private static void deleteNetworkDrive(File driveToDelete) {
         try {
             String command = System.getenv("SystemDrive") + "\\windows\\system32\\net.exe use " +
