@@ -282,7 +282,6 @@ public class ConfigurationPopupMenu extends JFrame {
      */
     private void generateXML() {
         try {
-            System.out.println("Do we get here");
             // Set up file and doc builder
             File fXmlFile = new File("resources/" + project.getName() + "config.xml");
             // If the file doesn't already exist, create it
@@ -300,7 +299,6 @@ public class ConfigurationPopupMenu extends JFrame {
             if (includeElement == null) {
                 System.out.println("Includes list from user's project configuration XML does not exist. Check plugin's resources directory.");
             } else {
-                System.out.println("Do we get here1");
                 updateIncludes(includeElement);
                 StringBuilder emailStringBuilder = new StringBuilder("");
                 for (Object email : emails) {
@@ -327,7 +325,6 @@ public class ConfigurationPopupMenu extends JFrame {
     }
 
     private void updateIncludes(Node includeElement) {
-        System.out.println("Do we get here2");
         // Removes all previous diagramIDs
         doc.getElementsByTagName("include").item(0).setTextContent("");
 

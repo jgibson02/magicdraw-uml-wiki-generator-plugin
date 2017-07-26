@@ -70,8 +70,6 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 String propertyName = evt.getPropertyName();
-                System.out.println("Event being fired: " + evt
-                        .getPropertyName());
                 if (propertyName.equals(ExtendedPropertyNames.BOUNDS)) {
                     dirtyDiagrams.put(project.getActiveDiagram(), Status.UPDATED);
                 }
