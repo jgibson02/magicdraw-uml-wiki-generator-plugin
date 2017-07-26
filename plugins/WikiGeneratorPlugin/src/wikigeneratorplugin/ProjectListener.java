@@ -66,13 +66,10 @@ public class ProjectListener extends ProjectEventListenerAdapter {
         this.project = project;
         this.diagramsDirectory = "s:\\SitePages\\" + project.getName() + "\\diagrams\\";
         Application.getInstance().getProjectsManager().addProjectListener(this);
-        DiagramListenerAdapter adapter = new DiagramListenerAdapter(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                String propertyName = evt.getPropertyName();
-                if (propertyName.equals(ExtendedPropertyNames.BOUNDS)) {
-                    dirtyDiagrams.put(project.getActiveDiagram(), Status.UPDATED);
-                }
+        DiagramListenerAdapter adapter = new DiagramListenerAdapter(evt -> {
+            String propertyName = evt.getPropertyName();
+            if (propertyName.equals(ExtendedPropertyNames.BOUNDS)) {
+                dirtyDiagrams.put(project.getActiveDiagram(), Status.UPDATED);
             }
         });
         adapter.install(project);
@@ -142,7 +139,8 @@ public class ProjectListener extends ProjectEventListenerAdapter {
         // If yes, continue with the upload process
         if (dialogResponse == JOptionPane.YES_OPTION) {
             if (xmlExists == false) {
-                Application.getInstance().getGUILog().showError("No project config found for this project, please go to Tools -> SharePoint Plugin Options and configure options before continuing.");
+                Application.getInstance().getGUILog().showError("No project " +
+                        "config found for this project, \nplease go to Tools -> SharePoint Plugin Options and configure options before continuing.");
                 return;
             }
             // Get all diagrams and add new ones that are in the project config
@@ -311,7 +309,9 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             } catch (IOException e) {
                 System.out.println("Error writing HTML to SharePoint:");
                 e.printStackTrace();
-                Application.getInstance().getGUILog().showMessage("Error writing HTML to SharePoint:\n" + e.getMessage());
+                Application.getInstance().getGUILog().showMessage("IO " +
+                        "Exception writing HTML to SharePoint:\n" + e
+                        .getMessage());
             }
 
             if (sendEmail) {
@@ -399,18 +399,18 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             }
         }
         if (updated.length() > 0) {
-            updated.insert(0,"UPDATED:%0A");
+            updated.insert(0, "UPDATED:%0A");
         }
         if (email.length() > 0) {
-            email.insert(0,"CREATED:%0A");
+            email.insert(0, "CREATED:%0A");
         }
         email.append(updated);
         email.insert(0, "mailto:" + dsvEmailRecipients + "?subject=" + project
-                .getName() +"%20-%20Changelog&body=");
+                .getName() + "%20-%20Changelog&body=");
         if (removedDiagrams.size() > 0) {
             email.append("REMOVED:%0A");
             for (String removed : removedDiagrams) {
-                email.append("  - " + removed.replace(".svg","") + "%0A");
+                email.append("  - " + removed.replace(".svg", "") + "%0A");
             }
         }
         System.out.println(email.toString());
