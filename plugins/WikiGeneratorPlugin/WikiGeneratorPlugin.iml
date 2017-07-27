@@ -20,5 +20,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="MagicDraw" level="project" />
     <orderEntry type="library" name="javax.json-1.1.0-M2" level="project" />
+    <orderEntry type="library" name="commons-io-2.5" level="project" />
   </component>
 </module>
