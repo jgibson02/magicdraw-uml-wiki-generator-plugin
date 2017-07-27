@@ -7,6 +7,8 @@ import com.nomagic.magicdraw.export.image.ImageExporter;
 import com.nomagic.magicdraw.uml.ExtendedPropertyNames;
 import com.nomagic.magicdraw.uml.symbols.DiagramListenerAdapter;
 import com.nomagic.magicdraw.uml.symbols.DiagramPresentationElement;
+import com.nomagic.uml2.ext.jmi.helpers.StereotypesHelper;
+import com.nomagic.uml2.ext.magicdraw.mdprofiles.Stereotype;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -63,6 +65,9 @@ public class ProjectListener extends ProjectEventListenerAdapter {
         Application.getInstance().getProjectsManager().addProjectListener(this);
         DiagramListenerAdapter adapter = new DiagramListenerAdapter(evt -> {
             String propertyName = evt.getPropertyName();
+            StereotypesHelper.getStereotypes(project.getActiveDiagram().getElement());
+            System.out.println(StereotypesHelper.getStereotypes(project
+                    .getActiveDiagram().getElement()).toString());
             if (propertyName.equals(ExtendedPropertyNames.BOUNDS)) {
                 dirtyDiagrams.put(project.getActiveDiagram(), Status.UPDATED);
             }
@@ -96,7 +101,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
         try {
             // Parse projectconfig.xml for diagrams that need to be included
             File fXmlFile = new File
-                    ("resources/configfiles" + project.getName() + "config.xml");
+                    ("resources/config/" + project.getName() + "config.xml");
             if (fXmlFile.exists() == false) {
                 xmlExists = false;
             } else {
