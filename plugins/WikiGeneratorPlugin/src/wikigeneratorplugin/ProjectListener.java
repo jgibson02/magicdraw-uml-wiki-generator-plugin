@@ -204,8 +204,11 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             // Create JSON object of project and diagram data.
             JsonBuilderFactory factory = Json.createBuilderFactory(null);
             JsonObject projectJsonObject;
+            String changelog = constructChangelog();
             JsonObjectBuilder projectObjectBuilder = factory.createObjectBuilder()
-                    .add("projectName", project.getName());
+                    .add("projectName", project.getName())
+                    .add("changelog", changelog);
+
             JsonArrayBuilder diagramTypesArrayBuilder = factory.createArrayBuilder();
             JsonObjectBuilder actObjectBuilder = factory.createObjectBuilder();
                 actObjectBuilder.add("title", "Process Flow/Flow Chart (act)");
@@ -263,71 +266,70 @@ public class ProjectListener extends ProjectEventListenerAdapter {
 
                     JsonObjectBuilder diagramObjectBuilder = factory.createObjectBuilder()
                         .add("title", diagramName)
-                        .add("lastModified", iso8601LastModified)
-                        .add("lastModifiedBy", lastModifiedBy)
+                        .add("subtitle", iso8601LastModified + " by " + lastModifiedBy)
                         .add("url", url)
                         .add("comments", "");
 
                     switch (diagramType) {
-                        case "SysML Activity Diagram":
-                            diagramType = "Process Flow/Flow Chart (Activity Diagram)";
-                            diagramClass = "act";
-                            diagramObjectBuilder.add("className", diagramClass);
-                            actArrayBuilder.add(diagramObjectBuilder.build());
-                            break;
-                        case "SysML Block Definition Diagram":
-                            diagramType = "Architecture/Decomposition (Block Definition Diagram)";
-                            diagramClass = "bdd";
-                            diagramObjectBuilder.add("className", diagramClass);
-                            bddArrayBuilder.add(diagramObjectBuilder.build());
-                            break;
-                        case "SysML Internal Block Diagram":
-                            diagramType = "Interface (Internal Block Diagram)";
-                            diagramClass = "ibd";
-                            diagramObjectBuilder.add("className", diagramClass);
-                            ibdArrayBuilder.add(diagramObjectBuilder.build());
-                            break;
-                        case "SysML Package Diagram":
-                            diagramType = "Doc Tree/Organization (Package Diagram)";
-                            diagramClass = "pkg";
-                            diagramObjectBuilder.add("className", diagramClass);
-                            pkgArrayBuilder.add(diagramObjectBuilder.build());
-                            break;
-                        case "SysML Parametric Diagram":
-                            diagramType = "Parametric Diagram";
-                            diagramClass = "par";
-                            diagramObjectBuilder.add("className", diagramClass);
-                            parArrayBuilder.add(diagramObjectBuilder.build());
-                            break;
-                        case "Requirement Diagram":
-                            diagramClass = "req";
-                            diagramObjectBuilder.add("className", diagramClass);
-                            reqArrayBuilder.add(diagramObjectBuilder.build());
-                            break;
-                        case "SysML Sequence Diagram":
-                            diagramType = "Interaction/System Behavior (Sequence Diagram)";
-                            diagramClass = "sd";
-                            diagramObjectBuilder.add("className", diagramClass);
-                            sdstmArrayBuilder.add(diagramObjectBuilder.build());
-                            break;
-                        case "SysML State Machine Diagram":
-                            diagramType = "Interaction/System Behavior (State Machine Diagram)";
-                            diagramClass = "stm";
-                            diagramObjectBuilder.add("className", diagramClass);
-                            sdstmArrayBuilder.add(diagramObjectBuilder.build());
-                            break;
-                        case "SysML Use Case Diagram":
-                            diagramType = "Stakeholder Analysis (Use Case Diagram)";
-                            diagramClass = "uc";
-                            diagramObjectBuilder.add("className", diagramClass);
-                            ucArrayBuilder.add(diagramObjectBuilder.build());
-                            break;
-                        default:
-                            diagramType += " (Other)";
-                            diagramClass = "other";
-                            diagramObjectBuilder.add("className", diagramClass);
-                            otherArrayBuilder.add(diagramObjectBuilder.build());
-                    } // switch (diagramType)
+                    case "SysML Activity Diagram":
+                        diagramType = "Process Flow/Flow Chart (Activity Diagram)";
+                        diagramClass = "act";
+                        diagramObjectBuilder.add("type", diagramType);
+                        actArrayBuilder.add(diagramObjectBuilder.build());
+                        break;
+                    case "SysML Block Definition Diagram":
+                        diagramType = "Architecture/Decomposition (Block Definition Diagram)";
+                        diagramClass = "bdd";
+                        diagramObjectBuilder.add("type", diagramType);
+                        bddArrayBuilder.add(diagramObjectBuilder.build());
+                        break;
+                    case "SysML Internal Block Diagram":
+                        diagramType = "Interface (Internal Block Diagram)";
+                        diagramClass = "ibd";
+                        diagramObjectBuilder.add("type", diagramType);
+                        ibdArrayBuilder.add(diagramObjectBuilder.build());
+                        break;
+                    case "SysML Package Diagram":
+                        diagramType = "Doc Tree/Organization (Package Diagram)";
+                        diagramClass = "pkg";
+                        diagramObjectBuilder.add("type", diagramType);
+                        pkgArrayBuilder.add(diagramObjectBuilder.build());
+                        break;
+                    case "SysML Parametric Diagram":
+                        diagramType = "Parametric Diagram";
+                        diagramClass = "par";
+                        diagramObjectBuilder.add("type", diagramType);
+                        parArrayBuilder.add(diagramObjectBuilder.build());
+                        break;
+                    case "Requirement Diagram":
+                        diagramClass = "req";
+                        diagramObjectBuilder.add("type", diagramType);
+                        reqArrayBuilder.add(diagramObjectBuilder.build());
+                        break;
+                    case "SysML Sequence Diagram":
+                        diagramType = "Interaction/System Behavior (Sequence Diagram)";
+                        diagramClass = "sd";
+                        diagramObjectBuilder.add("type", diagramType);
+                        sdstmArrayBuilder.add(diagramObjectBuilder.build());
+                        break;
+                    case "SysML State Machine Diagram":
+                        diagramType = "Interaction/System Behavior (State Machine Diagram)";
+                        diagramClass = "stm";
+                        diagramObjectBuilder.add("type", diagramType);
+                        sdstmArrayBuilder.add(diagramObjectBuilder.build());
+                        break;
+                    case "SysML Use Case Diagram":
+                        diagramType = "Stakeholder Analysis (Use Case Diagram)";
+                        diagramClass = "uc";
+                        diagramObjectBuilder.add("type", diagramType);
+                        ucArrayBuilder.add(diagramObjectBuilder.build());
+                        break;
+                    default:
+                        diagramType += " (Other)";
+                        diagramClass = "other";
+                        diagramObjectBuilder.add("type", diagramType);
+                        otherArrayBuilder.add(diagramObjectBuilder.build());
+                } // switch (diagramType)
 
                     htmlBuilder.append("<div class=\"card diagram-card " + diagramClass + "\">" +
                             "<div class=\"card-block\">" +
@@ -359,7 +361,9 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                         .getMessage());
             }
 
-            String changelog = constructChangelog();
+            //==========================================================================================================
+            //  Opens a new email addressed to the user's email recipients list with the changelog as the body.
+            //==========================================================================================================
             if (sendEmail) {
                 try {
                     String email = "mailto:" + dsvEmailRecipients + "?subject=" + project
@@ -372,6 +376,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                     e.printStackTrace();
                 }
             }
+            //==========================================================================================================
 
             actObjectBuilder.add("children", actArrayBuilder.build());
             bddObjectBuilder.add("children", bddArrayBuilder.build());
