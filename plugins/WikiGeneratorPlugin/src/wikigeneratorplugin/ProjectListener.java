@@ -194,8 +194,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             JsonBuilderFactory factory = Json.createBuilderFactory(null);
             JsonObject projectJsonObject;
             JsonObjectBuilder projectObjectBuilder = factory.createObjectBuilder()
-                    .add("projectName", project.getName())
-                    .add("lastModified", "2013-01-13T12:54:09,186Z");
+                    .add("projectName", project.getName());
             JsonArrayBuilder diagramTypesArrayBuilder = factory.createArrayBuilder();
             JsonObjectBuilder actObjectBuilder = factory.createObjectBuilder();
                 actObjectBuilder.add("title", "Process Flow/Flow Chart (act)");
@@ -255,7 +254,8 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                         .add("title", diagramName)
                         .add("lastModified", iso8601LastModified)
                         .add("lastModifiedBy", lastModifiedBy)
-                        .add("url", url);
+                        .add("url", url)
+                        .add("comments", "");
 
                     switch (diagramType) {
                         case "SysML Activity Diagram":
@@ -381,9 +381,6 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             diagramTypesArrayBuilder.add(ucObjectBuilder.build());
             diagramTypesArrayBuilder.add(otherObjectBuilder.build());
             projectObjectBuilder.add("diagrams", diagramTypesArrayBuilder.build());
-            projectObjectBuilder.add("changelog", changelog);
-            projectObjectBuilder.add("comments", "");
-            projectObjectBuilder.add("creationDate", "");
             projectJsonObject = projectObjectBuilder.build();
             File jsonLocation = new File("s:\\SitePages\\"+project.getName()+"\\" + project.getName()+".txt");
             Application.getInstance().getGUILog().log("Writing project JSON to: " + jsonLocation.getAbsolutePath());
