@@ -381,6 +381,9 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             diagramTypesArrayBuilder.add(ucObjectBuilder.build());
             diagramTypesArrayBuilder.add(otherObjectBuilder.build());
             projectObjectBuilder.add("diagrams", diagramTypesArrayBuilder.build());
+            projectObjectBuilder.add("changelog", changelog);
+            projectObjectBuilder.add("comments", "");
+            projectObjectBuilder.add("creationDate", "");
             projectJsonObject = projectObjectBuilder.build();
             File jsonLocation = new File("s:\\SitePages\\"+project.getName()+"\\" + project.getName()+".txt");
             Application.getInstance().getGUILog().log("Writing project JSON to: " + jsonLocation.getAbsolutePath());
