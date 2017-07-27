@@ -7,7 +7,6 @@ import com.nomagic.magicdraw.export.image.ImageExporter;
 import com.nomagic.magicdraw.uml.ExtendedPropertyNames;
 import com.nomagic.magicdraw.uml.symbols.DiagramListenerAdapter;
 import com.nomagic.magicdraw.uml.symbols.DiagramPresentationElement;
-import com.nomagic.magicdraw.uml.symbols.shapes.StereotypeView;
 import com.nomagic.uml2.ext.jmi.helpers.StereotypesHelper;
 import com.nomagic.uml2.ext.magicdraw.mdprofiles.Stereotype;
 import org.w3c.dom.Document;
@@ -28,8 +27,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
-
-import static com.nomagic.uml2.ext.jmi.helpers.StereotypesHelper.getStereotypes;
 
 /**
  * Author: Kareem Abdol-Hamid kkabdolh
@@ -69,14 +66,16 @@ public class ProjectListener extends ProjectEventListenerAdapter {
         Application.getInstance().getProjectsManager().addProjectListener(this);
         DiagramListenerAdapter adapter = new DiagramListenerAdapter(evt -> {
             String propertyName = evt.getPropertyName();
-            List<Stereotype> stereotypes = StereotypesHelper.getStereotypes(project
-                    .getActiveDiagram().getElement());
-            for (Stereotype s : stereotypes) {
-                System.out.println("Human Name: " + s.getHumanName() + "ID: "
-                        + s.getID());
-            }
             if (propertyName.equals(ExtendedPropertyNames.BOUNDS)) {
                 dirtyDiagrams.put(project.getActiveDiagram(), Status.UPDATED);
+                List<Stereotype> stereotypes = StereotypesHelper.getStereotypes(project
+                        .getActiveDiagram().getElement());
+                for (Stereotype s : stereotypes) {
+                    System.out.println("Name: " + s.getName() + " Qname: "
+                            + s.getQualifiedName());
+                    System.out.println(StereotypesHelper
+                            .getPropertyByName(s,"DiagramInfo"));
+                }
             }
         });
         adapter.install(project);
@@ -365,8 +364,9 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                 try {
                     String email = "mailto:" + dsvEmailRecipients + "?subject=" + project
                             .getName() + " - Changelog&body=" + changelog;
-                    email.replace(" ", "%20").replace("\n","%0A");
-                    Desktop.getDesktop().browse(URI.create(email));
+                    System.out.println("THIS IS THE EMAIL" + email.replace
+                                    (" ", "%20").replace("\n","%0A"));
+                    Desktop.getDesktop().browse(URI.create(email.replace(" ", "%20").replace("\n","%0A")));
                 } catch (IOException e) {
                     Application.getInstance().getGUILog().showError("Could not create email for recipients: " + e.getMessage());
                     e.printStackTrace();
@@ -452,13 +452,13 @@ public class ProjectListener extends ProjectEventListenerAdapter {
     }
 
     private String constructChangelog() {
-        StringBuilder email = new StringBuilder();
+        StringBuilder changelog = new StringBuilder();
         StringBuilder updated = new StringBuilder();
         for (DiagramPresentationElement dpe : dirtyDiagrams.keySet()) {
             System.out.println(dirtyDiagrams.get(dpe).getString());
             switch (dirtyDiagrams.get(dpe)) {
                 case CREATED:
-                    email.append("  - " + dpe.getDiagram().getName() + "\n");
+                    changelog.append("  - " + dpe.getDiagram().getName() + "\n");
                     break;
                 case UPDATED:
                     updated.append("  - " + dpe.getDiagram().getName() + "\n");
@@ -468,18 +468,18 @@ public class ProjectListener extends ProjectEventListenerAdapter {
         if (updated.length() > 0) {
             updated.insert(0, "UPDATED:\n");
         }
-        if (email.length() > 0) {
-            email.insert(0, "CREATED:\n");
+        if (changelog.length() > 0) {
+            changelog.insert(0, "CREATED:\n");
         }
-        email.append(updated);
+        changelog.append(updated);
         if (removedDiagrams.size() > 0) {
-            email.append("REMOVED:\n");
+            changelog.append("REMOVED:\n");
             for (String removed : removedDiagrams) {
-                email.append("  - " + removed.replace(".svg", "") + "\n");
+                changelog.append("  - " + removed.replace(".svg", "") + "\n");
             }
         }
-        System.out.println(email.toString());
-        return email.toString();
+        System.out.println(changelog.toString());
+        return changelog.toString();
     }
 
 }
