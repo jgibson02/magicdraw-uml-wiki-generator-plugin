@@ -19,6 +19,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="MagicDraw" level="project" />
-    <orderEntry type="library" name="javax.json-api-1.0" level="project" />
+    <orderEntry type="library" name="javax.json-1.1.0-M2" level="project" />
   </component>
 </module>

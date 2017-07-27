@@ -96,7 +96,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
         try {
             // Parse projectconfig.xml for diagrams that need to be included
             File fXmlFile = new File
-                    ("resources/" + project.getName() + "config.xml");
+                    ("resources/configfiles" + project.getName() + "config.xml");
             if (fXmlFile.exists() == false) {
                 xmlExists = false;
             } else {

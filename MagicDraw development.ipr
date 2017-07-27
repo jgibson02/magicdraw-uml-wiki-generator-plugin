@@ -154,7 +154,7 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://C:\Users\jhgibso1\Documents\GitHub\UMLWikiGenerator\plugins\All Plugins\All Plugins.iml" filepath="C:\Users\jhgibso1\Documents\GitHub\UMLWikiGenerator\plugins\All Plugins\All Plugins.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../../jhgibso1/Documents/GitHub/UMLWikiGenerator/plugins/All Plugins/All Plugins.iml" filepath="$PROJECT_DIR$/../../../jhgibso1/Documents/GitHub/UMLWikiGenerator/plugins/All Plugins/All Plugins.iml" />
       <module fileurl="file://$PROJECT_DIR$/plugins/WikiGeneratorPlugin/WikiGeneratorPlugin.iml" filepath="$PROJECT_DIR$/plugins/WikiGeneratorPlugin/WikiGeneratorPlugin.iml" />
     </modules>
   </component>
@@ -162,32 +162,6 @@
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="MyPlugin1Test" type="JUnit" factoryName="JUnit">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <module name="All Plugins" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" value="" />
-      <option name="PACKAGE_NAME" value="wikigeneratorplugin" />
-      <option name="MAIN_CLASS_NAME" value="wikigeneratorplugin.MyPlugin1Test" />
-      <option name="METHOD_NAME" value="" />
-      <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" value="-Xmx1200M -Xss1024K -XX:PermSize=60M -XX:MaxPermSize=200M -DLOCALCONFIG=true -Dinstall.root=${MAGIC_DRAW_INSTALL_DIRECTORY} -Dmd.plugins.dir=${MAGIC_DRAW_INSTALL_DIRECTORY}/plugins;.." />
-      <option name="PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="file://$MODULE_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="singleModule" />
-      </option>
-      <envs />
-      <patterns />
-      <RunnerSettings RunnerId="JProfiler">
-        <option name="WINDOW" value="false" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method />
-    </configuration>
     <configuration default="false" name="MagicDraw with all plugins" type="Application" factoryName="Application">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <option name="MAIN_CLASS_NAME" value="com.nomagic.magicdraw.Main" />
@@ -214,15 +188,41 @@
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
+    <configuration default="false" name="MyPlugin1Test" type="JUnit" factoryName="JUnit">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="All Plugins" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" value="" />
+      <option name="PACKAGE_NAME" value="wikigeneratorplugin" />
+      <option name="MAIN_CLASS_NAME" value="wikigeneratorplugin.MyPlugin1Test" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-Xmx1200M -Xss1024K -XX:PermSize=60M -XX:MaxPermSize=200M -DLOCALCONFIG=true -Dinstall.root=${MAGIC_DRAW_INSTALL_DIRECTORY} -Dmd.plugins.dir=${MAGIC_DRAW_INSTALL_DIRECTORY}/plugins;.." />
+      <option name="PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="file://$MODULE_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <envs />
+      <patterns />
+      <RunnerSettings RunnerId="JProfiler">
+        <option name="WINDOW" value="false" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
   </component>
   <component name="libraryTable">
-    <library name="javax.json-api-1.0">
+    <library name="javax.json-1.1.0-M2">
       <CLASSES>
-        <root url="jar://$USER_HOME$/Downloads/javax.json-api-1.0.jar!/" />
-        <root url="jar://$USER_HOME$/Downloads/javax.json-1.1.0-M2.jar!/" />
+        <root url="jar://$PROJECT_DIR$/plugins/WikiGeneratorPlugin/resources/libs/javax.json-1.1.0-M2.jar!/" />
+        <root url="jar://$PROJECT_DIR$/plugins/WikiGeneratorPlugin/resources/libs/javax.json-api-1.0.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
