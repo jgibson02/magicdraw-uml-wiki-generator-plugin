@@ -27,7 +27,7 @@ import java.util.LinkedList;
 /**
  * Author: Kareem Abdol-Hamid kkabdolh
  * Version: 6/29/2017
- * 
+ *
  * This class is used to generate a popup menu in MagicDraw for the user to
  * interact with, it allows the user to choose which diagrams they want to
  * include in  their SharePoint upload

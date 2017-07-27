@@ -348,9 +348,13 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                         .getMessage());
             }
 
+            String changelog = constructChangelog();
             if (sendEmail) {
                 try {
-                    Desktop.getDesktop().browse(URI.create(constructEmail()));
+                    String email = "mailto:" + dsvEmailRecipients + "?subject=" + project
+                            .getName() + " - Changelog&body=" + changelog;
+                    email.replace(" ", "%20").replace("\n","%0A");
+                    Desktop.getDesktop().browse(URI.create(email));
                 } catch (IOException e) {
                     Application.getInstance().getGUILog().showError("Could not create email for recipients: " + e.getMessage());
                     e.printStackTrace();
@@ -435,29 +439,29 @@ public class ProjectListener extends ProjectEventListenerAdapter {
         }
     }
 
-    private String constructEmail() {
+    private String constructChangelog() {
         StringBuilder email = new StringBuilder();
         StringBuilder updated = new StringBuilder();
         for (DiagramPresentationElement dpe : dirtyDiagrams.keySet()) {
             System.out.println(dirtyDiagrams.get(dpe).getString());
             switch (dirtyDiagrams.get(dpe)) {
                 case CREATED:
-                    email.append("  - " + dpe.getDiagram().getName() + "%0A");
+                    email.append("  - " + dpe.getDiagram().getName() + "\n");
                     break;
                 case UPDATED:
-                    updated.append("  - " + dpe.getDiagram().getName() + "%0A");
+                    updated.append("  - " + dpe.getDiagram().getName() + "\n");
                     break;
             }
         }
         if (updated.length() > 0) {
-            updated.insert(0, "UPDATED:%0A");
+            updated.insert(0, "UPDATED:\n");
         }
         if (email.length() > 0) {
-            email.insert(0, "CREATED:%0A");
+            email.insert(0, "CREATED:\n");
         }
         email.append(updated);
         email.insert(0, "mailto:" + dsvEmailRecipients + "?subject=" + project
-                .getName() + "%20-%20Changelog&body=");
+                .getName() + " - Changelog&body=");
         if (removedDiagrams.size() > 0) {
             email.append("REMOVED:%0A");
             for (String removed : removedDiagrams) {
@@ -465,7 +469,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             }
         }
         System.out.println(email.toString());
-        return email.toString().replace(" ", "%20");
+        return email.toString();
     }
 
 }
