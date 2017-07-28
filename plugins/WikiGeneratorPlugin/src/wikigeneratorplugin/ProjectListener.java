@@ -22,6 +22,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.awt.*;
 import java.io.*;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -45,6 +46,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
     private String spSiteURL;
     private String dsvEmailRecipients;
     private LinkedList<String> removedDiagrams;
+    private DateFormat df;
 
     /**
      * Initializes collections.
@@ -56,6 +58,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
         this.spSiteURL = null;
         this.dsvEmailRecipients = null;
         this.project = null;
+        this.df = new SimpleDateFormat("MMM d, yyyy HH:mm:ss z");
     }
 
     @Override
@@ -67,8 +70,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             String propertyName = evt.getPropertyName();
             if (propertyName.equals(ExtendedPropertyNames.BOUNDS)) {
                 dirtyDiagrams.put(project.getActiveDiagram(), Status.UPDATED);
-                List<Stereotype> stereotypes = StereotypesHelper.getStereotypes(project
-                        .getActiveDiagram().getElement());
+                List<Stereotype> stereotypes = StereotypesHelper.getStereotypes(project.getActiveDiagram().getElement());
                 for (Stereotype s : stereotypes) {
                     System.out.println("Name: " + s.getName() + " Qname: "
                             + s.getQualifiedName());
@@ -205,10 +207,8 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             // Create JSON object of project and diagram data.
             JsonBuilderFactory factory = Json.createBuilderFactory(null);
             JsonObject projectJsonObject;
-            String changelog = constructChangelog();
             JsonObjectBuilder projectObjectBuilder = factory.createObjectBuilder()
-                    .add("projectName", project.getName())
-                    .add("changelog", changelog);
+                    .add("projectName", project.getName());
 
             //==========================================================================================================
             //  Setting up diagram types structure
@@ -263,9 +263,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                 File SVGFileLocation = new File(diagramsDirectory + '\\' + diagramName + ".svg");
                 if (SVGFileLocation.exists()) {
                     String url = "diagrams/" + diagramName + ".svg".replace(" ", "%20"); // Kinda URL-encode the svg path
-                    DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.US);
-                    df.setTimeZone(TimeZone.getTimeZone("UTC"));
-                    String formattedLastModified = df.format(new Date(SVGFileLocation.lastModified())) + " UTC";
+                    String formattedLastModified = df.format(new Date(SVGFileLocation.lastModified()));
                     String lastModifiedBy = System.getProperty("user.name");
                     String diagramType = dpe.getDiagramType().getType();
 
@@ -353,6 +351,13 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            //==========================================================================================================
+
+
+            //==========================================================================================================
+            //  Constructs this session's changes and adds it to the on-disk changelog.
+            //==========================================================================================================
+            String changelog = constructChangelog();
             //==========================================================================================================
 
 
@@ -474,32 +479,67 @@ public class ProjectListener extends ProjectEventListenerAdapter {
 
     private String constructChangelog() {
         StringBuilder changelog = new StringBuilder();
-        StringBuilder updated = new StringBuilder();
+        // Add a timestamp
+        changelog.append(df.format(new Date()) + '\n');
+
+        ArrayList<String> created = new ArrayList<>();
+        ArrayList<String> updated = new ArrayList<>();
+
+        // Add altered diagrams into changelog, categorized by CHANGED, UPDATED, and REMOVED
         for (DiagramPresentationElement dpe : dirtyDiagrams.keySet()) {
             System.out.println(dirtyDiagrams.get(dpe).getString());
-            switch (dirtyDiagrams.get(dpe)) {
+                switch (dirtyDiagrams.get(dpe)) {
                 case CREATED:
-                    changelog.append("  - " + dpe.getDiagram().getName() + "\n");
+                    created.add("  - " + dpe.getDiagram().getName());
                     break;
                 case UPDATED:
-                    updated.append("  - " + dpe.getDiagram().getName() + "\n");
+                    updated.add("  - " + dpe.getDiagram().getName());
                     break;
             }
         }
-        if (updated.length() > 0) {
-            updated.insert(0, "UPDATED:\n");
+        if (created.size() > 0) {
+            changelog.append("CREATED:\n");
+            for (String s : created) {
+                changelog.append(s + '\n');
+            }
         }
-        if (changelog.length() > 0) {
-            changelog.insert(0, "CREATED:\n");
+        if (updated.size() > 0) {
+            changelog.append("UPDATED:\n");
+            for (String s : updated) {
+                changelog.append(s + '\n');
+            }
         }
-        changelog.append(updated);
         if (removedDiagrams.size() > 0) {
             changelog.append("REMOVED:\n");
             for (String removed : removedDiagrams) {
                 changelog.append("  - " + removed.replace(".svg", "") + "\n");
             }
         }
+
+        // Leave message if no changes were made
+        if (created.size() == 0 && updated.size() == 0 && removedDiagrams.size() == 0) {
+            changelog.append("No changes have been made.\n");
+        }
+
+        // Finalize changes block
+        changelog.append("\n");
         System.out.println(changelog.toString());
+
+        // Update changelog on disk
+        File changelogFile = new File("S:/SitePages/"+project.getName()+"/changelog.txt");
+        if (changelogFile.exists()) {
+            try {
+                changelog.append(FileUtils.readFileToString(changelogFile, StandardCharsets.US_ASCII));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            FileUtils.writeStringToFile(changelogFile, changelog.toString(), StandardCharsets.US_ASCII);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         return changelog.toString();
     }
     //==================================================================================================================
