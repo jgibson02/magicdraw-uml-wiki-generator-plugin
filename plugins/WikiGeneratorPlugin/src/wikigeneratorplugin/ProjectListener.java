@@ -353,13 +353,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             }
             //==========================================================================================================
 
-
-            //==========================================================================================================
-            //  Constructs this session's changes and adds it to the on-disk changelog.
-            //==========================================================================================================
-            String changelog = constructChangelog();
-            //==========================================================================================================
-
+            StringBuilder changelog = constructChangelog();
 
             //==========================================================================================================
             //  Opens a new email addressed to the user's email recipients list with the changelog as the body.
@@ -367,7 +361,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             if (sendEmail) {
                 try {
                     String email = "mailto:" + dsvEmailRecipients + "?subject=" + project
-                            .getName() + " - Changelog&body=" + changelog;
+                            .getName() + " - Changelog&body=" + changelog.toString();
                     System.out.println("THIS IS THE EMAIL" + email.replace
                                     (" ", "%20").replace("\n","%0A"));
                     Desktop.getDesktop().browse(URI.create(email.replace(" ", "%20").replace("\n","%0A")));
@@ -378,6 +372,26 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             }
             //==========================================================================================================
 
+            //==========================================================================================================
+            //  Constructs this session's changes and adds it to the on-disk changelog.
+            //==========================================================================================================
+            // Update changelog on disk
+            File changelogFile = new File("S:/SitePages/" + project.getName()
+                    + "/changelog.txt");
+            if (changelogFile.exists()) {
+                try {
+                    changelog.append(FileUtils.readFileToString(changelogFile, StandardCharsets.US_ASCII));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            try {
+                FileUtils.writeStringToFile(changelogFile, changelog.toString(), StandardCharsets.US_ASCII);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            //==========================================================================================================
 
             //==========================================================================================================
             //  Builds each diagram type object, and the rest of the project's JSON, then writes to disk.
@@ -477,7 +491,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
         }
     }
 
-    private String constructChangelog() {
+    private StringBuilder constructChangelog() {
         StringBuilder changelog = new StringBuilder();
         // Add a timestamp
         changelog.append(df.format(new Date()) + '\n');
@@ -525,22 +539,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
         changelog.append("\n");
         System.out.println(changelog.toString());
 
-        // Update changelog on disk
-        File changelogFile = new File("S:/SitePages/"+project.getName()+"/changelog.txt");
-        if (changelogFile.exists()) {
-            try {
-                changelog.append(FileUtils.readFileToString(changelogFile, StandardCharsets.US_ASCII));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        try {
-            FileUtils.writeStringToFile(changelogFile, changelog.toString(), StandardCharsets.US_ASCII);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return changelog.toString();
+        return changelog;
     }
     //==================================================================================================================
 
