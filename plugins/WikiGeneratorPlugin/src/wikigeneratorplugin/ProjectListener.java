@@ -72,6 +72,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             String propertyName = evt.getPropertyName();
             if (propertyName.equals(ExtendedPropertyNames.BOUNDS)) {
                 dirtyDiagrams.put(project.getActiveDiagram(), Status.UPDATED);
+
             }
         });
         adapter.install(project);
@@ -93,7 +94,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
 
         // Set up and prompt user if they want to upload to SharePoint and if
         // they want to have the page open or not
-        JCheckBox openWikiPageCheckbox = new JCheckBox("Open after completion?", true);
+        JCheckBox openWikiPageCheckbox = new JCheckBox("Open after completin?", true);
         JCheckBox emailCheckbox = new JCheckBox("Send email to your email list?", false);
         emailCheckbox.setEnabled(false); // Disable checkbox if user has no email recipients
         String promptMessage = "Update the wiki page on SharePoint?";
