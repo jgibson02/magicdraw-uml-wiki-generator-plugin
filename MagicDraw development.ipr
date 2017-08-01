@@ -161,32 +161,6 @@
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="MyPlugin1Test" type="JUnit" factoryName="JUnit">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <module name="All Plugins" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" value="" />
-      <option name="PACKAGE_NAME" value="wikigeneratorplugin" />
-      <option name="MAIN_CLASS_NAME" value="wikigeneratorplugin.MyPlugin1Test" />
-      <option name="METHOD_NAME" value="" />
-      <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" value="-Xmx1200M -Xss1024K -XX:PermSize=60M -XX:MaxPermSize=200M -DLOCALCONFIG=true -Dinstall.root=${MAGIC_DRAW_INSTALL_DIRECTORY} -Dmd.plugins.dir=${MAGIC_DRAW_INSTALL_DIRECTORY}/plugins;.." />
-      <option name="PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="file://$MODULE_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="singleModule" />
-      </option>
-      <envs />
-      <patterns />
-      <RunnerSettings RunnerId="JProfiler">
-        <option name="WINDOW" value="false" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method />
-    </configuration>
     <configuration default="false" name="MagicDraw with all plugins" type="Application" factoryName="Application">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <option name="MAIN_CLASS_NAME" value="com.nomagic.magicdraw.Main" />
@@ -210,6 +184,32 @@
       </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Debug" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="MyPlugin1Test" type="JUnit" factoryName="JUnit">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="All Plugins" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" value="" />
+      <option name="PACKAGE_NAME" value="wikigeneratorplugin" />
+      <option name="MAIN_CLASS_NAME" value="wikigeneratorplugin.MyPlugin1Test" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-Xmx1200M -Xss1024K -XX:PermSize=60M -XX:MaxPermSize=200M -DLOCALCONFIG=true -Dinstall.root=${MAGIC_DRAW_INSTALL_DIRECTORY} -Dmd.plugins.dir=${MAGIC_DRAW_INSTALL_DIRECTORY}/plugins;.." />
+      <option name="PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="file://$MODULE_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <envs />
+      <patterns />
+      <RunnerSettings RunnerId="JProfiler">
+        <option name="WINDOW" value="false" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
@@ -237,18 +237,17 @@
     </library>
     <library name="MagicDraw">
       <CLASSES>
-        <root url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/lib" />
-        <root url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/lib/graphics" />
-        <root url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/lib/webservice" />
+        <root url="file://C:/Program Files/MagicDraw184/lib" />
       </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAGIC_DRAW_INSTALL_DIRECTORY$/openapi/docs/javadoc.zip!/" />
-        <root url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/openapi/docs" />
-      </JAVADOC>
-      <SOURCES />
-      <jarDirectory url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/lib" recursive="false" />
-      <jarDirectory url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/lib/graphics" recursive="false" />
-      <jarDirectory url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/lib/webservice" recursive="false" />
+      <JAVADOC />
+      <NATIVE>
+        <root url="file://C:/Program Files/MagicDraw184/lib" />
+      </NATIVE>
+      <SOURCES>
+        <root url="file://C:/Program Files/MagicDraw184/lib" />
+      </SOURCES>
+      <jarDirectory url="file://C:/Program Files/MagicDraw184/lib" recursive="false" />
+      <jarDirectory url="file://C:/Program Files/MagicDraw184/lib" recursive="false" type="SOURCES" />
     </library>
   </component>
 </project>

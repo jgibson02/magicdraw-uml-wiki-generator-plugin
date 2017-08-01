@@ -191,13 +191,13 @@ public class ConfigurationPopupMenu extends JFrame {
         for (DiagramPresentationElement dpe : dpes) {
             boolean isInIncludedDiagrams = false;
             for (String s : includedDiagrams) {
-                if (s.equals(dpe.getDiagram().getID())) {
+                if (s.equals(dpe.getID())) {
                     isInIncludedDiagrams = true;
                     break; // already found, skip rest
                 }
             }
             if (isInIncludedDiagrams) {
-                includedDiagramsList.append(dpe.getDiagram().getName() + "\n");
+                includedDiagramsList.append(dpe.getName() + "\n");
                 includesListModel.addElement(dpe);
             } else {
                 excludesListModel.addElement(dpe);
@@ -338,7 +338,7 @@ public class ConfigurationPopupMenu extends JFrame {
                 DiagramPresentationElement dpe =
                         (DiagramPresentationElement) dpeObj;
                 Element diagramID = doc.createElement("diagramID");
-                diagramID.appendChild(doc.createTextNode(dpe.getDiagram().getID()));
+                diagramID.appendChild(doc.createTextNode(dpe.getID()));
                 if (includeElement.getNodeType() == Node.ELEMENT_NODE) {
                     includeElement.appendChild(diagramID);
                 }
@@ -454,7 +454,7 @@ public class ConfigurationPopupMenu extends JFrame {
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             if (value != null) {
-                value = ((DiagramPresentationElement) value).getDiagram().getName();
+                value = ((DiagramPresentationElement) value).getName();
             }
             return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
         }
