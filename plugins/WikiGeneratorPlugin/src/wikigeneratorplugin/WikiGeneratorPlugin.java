@@ -26,6 +26,8 @@ public class WikiGeneratorPlugin extends Plugin {
      */
     @Override
     public void init() {
+        Application.getInstance().getGUILog().showMessage
+                ("mattewtmarvin@naas.gov");
         ActionsConfiguratorsManager manager = ActionsConfiguratorsManager.getInstance();
         MDAction action = new ToolsMenuAction();
         manager.addMainMenuConfigurator(new ToolsMenuConfigurator(action));
