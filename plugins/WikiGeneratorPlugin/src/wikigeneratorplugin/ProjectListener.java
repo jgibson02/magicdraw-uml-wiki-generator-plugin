@@ -7,8 +7,6 @@ import com.nomagic.magicdraw.export.image.ImageExporter;
 import com.nomagic.magicdraw.uml.ExtendedPropertyNames;
 import com.nomagic.magicdraw.uml.symbols.DiagramListenerAdapter;
 import com.nomagic.magicdraw.uml.symbols.DiagramPresentationElement;
-import com.nomagic.uml2.ext.jmi.helpers.StereotypesHelper;
-import com.nomagic.uml2.ext.magicdraw.mdprofiles.Stereotype;
 import org.apache.commons.io.FileUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -20,18 +18,20 @@ import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.awt.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.List;
 
 /**
  * Author: Kareem Abdol-Hamid kkabdolh
  * Version: 6/27/2017
- *
+ * <p>
  * This responds anytime a MagicDraw project with this plugin installed is
  * saved. It will ask the user if they want to upload their changes to
  * SharePoint or not. The class uses the changes to the diagrams and the
@@ -72,13 +72,6 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             String propertyName = evt.getPropertyName();
             if (propertyName.equals(ExtendedPropertyNames.BOUNDS)) {
                 dirtyDiagrams.put(project.getActiveDiagram(), Status.UPDATED);
-                List<Stereotype> stereotypes = StereotypesHelper.getStereotypes(project.getActiveDiagram().getElement());
-                for (Stereotype s : stereotypes) {
-                    System.out.println("Name: " + s.getName() + " Qname: "
-                            + s.getQualifiedName());
-                    System.out.println(StereotypesHelper
-                            .getPropertyByName(s,"DiagramInfo"));
-                }
             }
         });
         adapter.install(project);
@@ -158,8 +151,8 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             for (DiagramPresentationElement dpe : diagrams) {
                 // Add to dirtyDiagrams if they are not in the project file
                 // and they are in the included diagrams list
-                if (!(new File(diagramsDirectory + dpe.getDiagram().getName() +
-                        ".svg")).exists() && includedDiagrams.contains(dpe.getDiagram().getID())) {
+                if (!(new File(diagramsDirectory + dpe.getName() +
+                        ".svg")).exists() && includedDiagrams.contains(dpe.getID())) {
                     dirtyDiagrams.put(dpe, Status.CREATED);
                 }
             }
@@ -177,9 +170,9 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                     boolean included = false;
                     // TODO: THIS CAN BE FIXED TO BE CLEANER I'M SURE
                     for (DiagramPresentationElement dpe : diagrams) {
-                        if (dpe.getDiagram().getName().equals(diagramNameFromFile)) {
+                        if (dpe.getName().equals(diagramNameFromFile)) {
                             isInDiagrams = true;
-                            if (includedDiagrams.contains(dpe.getDiagram().getID())) {
+                            if (includedDiagrams.contains(dpe.getID())) {
                                 included = true;
                             }
                         }
@@ -218,40 +211,40 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             JsonArrayBuilder diagramTypesArrayBuilder = factory.createArrayBuilder();
 
             JsonObjectBuilder actObjectBuilder = factory.createObjectBuilder();
-                actObjectBuilder.add("title", "Process Flow/Flow Chart (act)");
-                JsonArrayBuilder actArrayBuilder = factory.createArrayBuilder();
+            actObjectBuilder.add("title", "Process Flow/Flow Chart (act)");
+            JsonArrayBuilder actArrayBuilder = factory.createArrayBuilder();
 
             JsonObjectBuilder bddObjectBuilder = factory.createObjectBuilder();
-                bddObjectBuilder.add("title", "Architecture/Decomposition (bdd)");
-                JsonArrayBuilder bddArrayBuilder = factory.createArrayBuilder();
+            bddObjectBuilder.add("title", "Architecture/Decomposition (bdd)");
+            JsonArrayBuilder bddArrayBuilder = factory.createArrayBuilder();
 
             JsonObjectBuilder ibdObjectBuilder = factory.createObjectBuilder();
-                ibdObjectBuilder.add("title", "Interface (ibd)");
-                JsonArrayBuilder ibdArrayBuilder = factory.createArrayBuilder();
+            ibdObjectBuilder.add("title", "Interface (ibd)");
+            JsonArrayBuilder ibdArrayBuilder = factory.createArrayBuilder();
 
             JsonObjectBuilder pkgObjectBuilder = factory.createObjectBuilder();
-                pkgObjectBuilder.add("title", "Doc Tree/Organization (pkg)");
-                JsonArrayBuilder pkgArrayBuilder = factory.createArrayBuilder();
+            pkgObjectBuilder.add("title", "Doc Tree/Organization (pkg)");
+            JsonArrayBuilder pkgArrayBuilder = factory.createArrayBuilder();
 
             JsonObjectBuilder parObjectBuilder = factory.createObjectBuilder();
-                parObjectBuilder.add("title", "Parametric (par)");
-                JsonArrayBuilder parArrayBuilder = factory.createArrayBuilder();
+            parObjectBuilder.add("title", "Parametric (par)");
+            JsonArrayBuilder parArrayBuilder = factory.createArrayBuilder();
 
             JsonObjectBuilder reqObjectBuilder = factory.createObjectBuilder();
-                reqObjectBuilder.add("title", "Requirement (req)");
-                JsonArrayBuilder reqArrayBuilder = factory.createArrayBuilder();
+            reqObjectBuilder.add("title", "Requirement (req)");
+            JsonArrayBuilder reqArrayBuilder = factory.createArrayBuilder();
 
             JsonObjectBuilder sdstmObjectBuilder = factory.createObjectBuilder();
-                sdstmObjectBuilder.add("title", "Interaction/System Behavior (sd, stm)");
-                JsonArrayBuilder sdstmArrayBuilder = factory.createArrayBuilder();
+            sdstmObjectBuilder.add("title", "Interaction/System Behavior (sd, stm)");
+            JsonArrayBuilder sdstmArrayBuilder = factory.createArrayBuilder();
 
             JsonObjectBuilder ucObjectBuilder = factory.createObjectBuilder();
-                ucObjectBuilder.add("title", "Stakeholder Analysis (uc)");
-                JsonArrayBuilder ucArrayBuilder = factory.createArrayBuilder();
+            ucObjectBuilder.add("title", "Stakeholder Analysis (uc)");
+            JsonArrayBuilder ucArrayBuilder = factory.createArrayBuilder();
 
             JsonObjectBuilder otherObjectBuilder = factory.createObjectBuilder();
-                otherObjectBuilder.add("title", "Other");
-                JsonArrayBuilder otherArrayBuilder = factory.createArrayBuilder();
+            otherObjectBuilder.add("title", "Other");
+            JsonArrayBuilder otherArrayBuilder = factory.createArrayBuilder();
             //==========================================================================================================
 
 
@@ -260,7 +253,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             //  PROJECTNAME_DIAGRAMS directory.
             //==========================================================================================================
             for (DiagramPresentationElement dpe : project.getDiagrams()) {
-                String diagramName = dpe.getDiagram().getName();
+                String diagramName = dpe.getName();
                 // Test to see if diagram has an associated file
                 File SVGFileLocation = new File(diagramsDirectory + '\\' + diagramName + ".svg");
                 if (SVGFileLocation.exists()) {
@@ -270,10 +263,10 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                     String diagramType = dpe.getDiagramType().getType();
 
                     JsonObjectBuilder diagramObjectBuilder = factory.createObjectBuilder()
-                        .add("title", diagramName)
-                        .add("subtitle", formattedLastModified + " by " + lastModifiedBy)
-                        .add("url", url)
-                        .add("comments", "");
+                            .add("title", diagramName)
+                            .add("subtitle", formattedLastModified + " by " + lastModifiedBy)
+                            .add("url", url)
+                            .add("comments", "");
 
                     switch (diagramType) {
                         case "SysML Activity Diagram":
@@ -336,20 +329,25 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             //  Copies webpage dependencies to project's SharePoint folder if they don't exist.
             //==========================================================================================================
             try {
-                File cssDest = new File("S:/SitePages/"+project.getName()+"/css");
-                if (!cssDest.exists()) FileUtils.copyDirectory(new File("resources/css"), cssDest);
+                File cssDest = new File("S:/SitePages/" + project.getName() + "/css");
+                if (!cssDest.exists())
+                    FileUtils.copyDirectory(new File("resources/css"), cssDest);
 
-                File fontsDest = new File("S:/SitePages/"+project.getName()+"/fonts");
-                if (!fontsDest.exists()) FileUtils.copyDirectory(new File("resources/fonts"), fontsDest);
+                File imagesDest = new File("S:/SitePages/" + project.getName() + "/images");
+                if (!imagesDest.exists())
+                    FileUtils.copyDirectory(new File("resources/images"), imagesDest);
 
-                File imagesDest = new File("S:/SitePages/"+project.getName()+"/images");
-                if (!imagesDest.exists()) FileUtils.copyDirectory(new File("resources/images"), imagesDest);
+                File jsDest = new File("S:/SitePages/" + project.getName() + "/js");
+                if (!jsDest.exists())
+                    FileUtils.copyDirectory(new File("resources/js"), jsDest);
 
-                File jsDest = new File("S:/SitePages/"+project.getName()+"/js");
-                if (!jsDest.exists()) FileUtils.copyDirectory(new File("resources/js"), jsDest);
-
-                File htmlDest = new File("S:/SitePages/"+project.getName());
-                if (!htmlDest.exists()) FileUtils.copyFileToDirectory(new File("resources/index.html"), htmlDest);
+                File htmlDest = new File("S:/SitePages/" + project.getName() +
+                        "/index.html");
+                if (!htmlDest.exists()) {
+                    System.out.println("FUCK YOU");
+                    FileUtils.copyFile(new File("resources/index.html"),
+                            htmlDest);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -365,8 +363,8 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                     String email = "mailto:" + dsvEmailRecipients + "?subject=" + project
                             .getName() + " - Changelog&body=" + changelog.toString();
                     System.out.println("THIS IS THE EMAIL" + email.replace
-                                    (" ", "%20").replace("\n","%0A"));
-                    Desktop.getDesktop().browse(URI.create(email.replace(" ", "%20").replace("\n","%0A")));
+                            (" ", "%20").replace("\n", "%0A"));
+                    Desktop.getDesktop().browse(URI.create(email.replace(" ", "%20").replace("\n", "%0A")));
                 } catch (IOException e) {
                     Application.getInstance().getGUILog().showError("Could not create email for recipients: " + e.getMessage());
                     e.printStackTrace();
@@ -421,7 +419,14 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             projectJsonObject = projectObjectBuilder.build();
 
             // Writes assembled JSON to disk.
-            File jsonLocation = new File("S:/SitePages/"+project.getName()+"/js/data.txt");
+            File jsonLocation = new File("S:/SitePages/" + project.getName() + "/js/data.txt");
+            try {
+                if (!jsonLocation.exists()) {
+                    jsonLocation.createNewFile();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             Application.getInstance().getGUILog().log("Writing project JSON to: " + jsonLocation.getAbsolutePath());
             System.out.println("Writing project JSON to: " + jsonLocation.getAbsolutePath());
             try (JsonWriter writer = Json.createWriterFactory(null).createWriter(new FileOutputStream(jsonLocation))) {
@@ -454,8 +459,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
     //==================================================================================================================
     // Private Methods
     //==================================================================================================================
-    private void exportDiagrams(HashMap<DiagramPresentationElement, Status> dirtyDiagrams, String fileLoc)
-    {
+    private void exportDiagrams(HashMap<DiagramPresentationElement, Status> dirtyDiagrams, String fileLoc) {
         int count = 0;
         int total = dirtyDiagrams.size();
         if (total == 0) {
@@ -470,11 +474,11 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             for (DiagramPresentationElement dpe : dirtyDiagrams.keySet()) {
                 if (dpe != null) {
                     count++;
-                    File SVGFileLocation = new File(fileLoc + '\\' + dpe.getDiagram().getName() + ".svg");
+                    File SVGFileLocation = new File(fileLoc + '\\' + dpe.getName() + ".svg");
 
-                    Application.getInstance().getGUILog().log("Exporting " + dpe.getDiagram().getName() + ".svg to "
+                    Application.getInstance().getGUILog().log("Exporting " + dpe.getName() + ".svg to "
                             + SVGFileLocation.getAbsolutePath() + " (" + count + "/" + total + ")", true);
-                    System.out.println("Exporting " + dpe.getDiagram().getName() + ".svg to "
+                    System.out.println("Exporting " + dpe.getName() + ".svg to "
                             + SVGFileLocation.getAbsolutePath() + " (" + count + "/" + total + ")");
 
                     // This isn't actually multithreaded, MagicDraw is not thread-safe.
@@ -506,13 +510,15 @@ public class ProjectListener extends ProjectEventListenerAdapter {
         // Add altered diagrams into changelog, categorized by CHANGED, UPDATED, and REMOVED
         for (DiagramPresentationElement dpe : dirtyDiagrams.keySet()) {
             System.out.println(dirtyDiagrams.get(dpe).getString());
+            if (includedDiagrams.contains(dpe.getID())) {
                 switch (dirtyDiagrams.get(dpe)) {
-                case CREATED:
-                    created.add("  - " + dpe.getDiagram().getName());
-                    break;
-                case UPDATED:
-                    updated.add("  - " + dpe.getDiagram().getName());
-                    break;
+                    case CREATED:
+                        created.add("  - " + dpe.getName());
+                        break;
+                    case UPDATED:
+                        updated.add("  - " + dpe.getName());
+                        break;
+                }
             }
         }
         if (created.size() > 0) {

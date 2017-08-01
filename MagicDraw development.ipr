@@ -20,16 +20,52 @@
   <component name="InspectionProjectProfileManager">
     <profile version="1.0">
       <option name="myName" value="Project Default" />
+      <option name="myLocal" value="true" />
+      <inspection_tool class="ConstantConditions" enabled="true" level="WARNING" enabled_by_default="true">
+        <option name="SUGGEST_NULLABLE_ANNOTATIONS" value="true" />
+        <option name="DONT_REPORT_TRUE_ASSERT_STATEMENTS" value="false" />
+      </inspection_tool>
+      <inspection_tool class="ForCanBeForeach" enabled="false" level="WARNING" enabled_by_default="false">
+        <option name="REPORT_INDEXED_LOOP" value="true" />
+        <option name="ignoreUntypedCollections" value="false" />
+      </inspection_tool>
+      <inspection_tool class="JavaDoc" enabled="true" level="WARNING" enabled_by_default="true">
+        <option name="TOP_LEVEL_CLASS_OPTIONS">
+          <value>
+            <option name="ACCESS_JAVADOC_REQUIRED_FOR" value="none" />
+            <option name="REQUIRED_TAGS" value="" />
+          </value>
+        </option>
+        <option name="INNER_CLASS_OPTIONS">
+          <value>
+            <option name="ACCESS_JAVADOC_REQUIRED_FOR" value="none" />
+            <option name="REQUIRED_TAGS" value="" />
+          </value>
+        </option>
+        <option name="METHOD_OPTIONS">
+          <value>
+            <option name="ACCESS_JAVADOC_REQUIRED_FOR" value="none" />
+            <option name="REQUIRED_TAGS" value="@return@param@throws or @exception" />
+          </value>
+        </option>
+        <option name="FIELD_OPTIONS">
+          <value>
+            <option name="ACCESS_JAVADOC_REQUIRED_FOR" value="none" />
+            <option name="REQUIRED_TAGS" value="" />
+          </value>
+        </option>
+        <option name="IGNORE_DEPRECATED" value="false" />
+        <option name="IGNORE_JAVADOC_PERIOD" value="true" />
+        <option name="IGNORE_DUPLICATED_THROWS" value="false" />
+        <option name="IGNORE_POINT_TO_ITSELF" value="false" />
+        <option name="myAdditionalJavadocTags" value="openapi" />
+      </inspection_tool>
+      <inspection_tool class="LoggerInitializedWithForeignClass" enabled="false" level="WARNING" enabled_by_default="false">
+        <option name="loggerClassName" value="org.apache.log4j.Logger,org.slf4j.LoggerFactory,org.apache.commons.logging.LogFactory,java.util.logging.Logger" />
+        <option name="loggerFactoryMethodName" value="getLogger,getLogger,getLog,getLogger" />
+      </inspection_tool>
     </profile>
     <version value="1.0" />
-  </component>
-  <component name="IvyIDEA.ProjectSettings">
-    <option name="artifactTypeSettings">
-      <ArtifactTypeSettings />
-    </option>
-    <option name="propertiesSettings">
-      <PropertiesSettings />
-    </option>
   </component>
   <component name="Palette2">
     <group name="Swing">
@@ -154,43 +190,21 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/plugins/All Plugins/All Plugins.iml" filepath="$PROJECT_DIR$/plugins/All Plugins/All Plugins.iml" />
+      <module fileurl="file://$PROJECT_DIR$/My Commandline/My Commandline.iml" filepath="$PROJECT_DIR$/My Commandline/My Commandline.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plugins/My Plug-in 1/My Plug-in 1.iml" filepath="$PROJECT_DIR$/plugins/My Plug-in 1/My Plug-in 1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plugins/My Plug-in 2/My Plug-in 2.iml" filepath="$PROJECT_DIR$/plugins/My Plug-in 2/My Plug-in 2.iml" />
       <module fileurl="file://$PROJECT_DIR$/plugins/WikiGeneratorPlugin/WikiGeneratorPlugin.iml" filepath="$PROJECT_DIR$/plugins/WikiGeneratorPlugin/WikiGeneratorPlugin.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="false" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="MyPlugin1Test" type="JUnit" factoryName="JUnit">
+    <configuration default="false" name="MagicDraw" type="Application" factoryName="Application">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <module name="All Plugins" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" value="" />
-      <option name="PACKAGE_NAME" value="wikigeneratorplugin" />
-      <option name="MAIN_CLASS_NAME" value="wikigeneratorplugin.MyPlugin1Test" />
-      <option name="METHOD_NAME" value="" />
-      <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" value="-Xmx1200M -Xss1024K -XX:PermSize=60M -XX:MaxPermSize=200M -DLOCALCONFIG=true -Dinstall.root=${MAGIC_DRAW_INSTALL_DIRECTORY} -Dmd.plugins.dir=${MAGIC_DRAW_INSTALL_DIRECTORY}/plugins;.." />
-      <option name="PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="file://$MODULE_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="singleModule" />
-      </option>
-      <envs />
-      <patterns />
-      <RunnerSettings RunnerId="JProfiler">
-        <option name="WINDOW" value="false" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method />
-    </configuration>
-    <configuration default="false" name="MagicDraw with all plugins" type="Application" factoryName="Application">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <option name="MAIN_CLASS_NAME" value="com.nomagic.magicdraw.Main" />
-      <option name="VM_PARAMETERS" value="-Xmx1200M -Xss1024K -XX:PermSize=60M -XX:MaxPermSize=200M -DLOCALCONFIG=true -Dinstall.root=${MAGIC_DRAW_INSTALL_DIRECTORY} -Dmd.plugins.dir=${MAGIC_DRAW_INSTALL_DIRECTORY}/plugins;.." />
+      <option name="MAIN_CLASS_NAME" value="com.nomagic.osgi.launcher.ProductionFrameworkLauncher" />
+      <option name="VM_PARAMETERS" value="-Xmx2000M -Xss1024K -XX:PermSize=60M -XX:MaxPermSize=200M -DLOCALCONFIG=true -Dmd.class.path=$java.class.path -Dcom.nomagic.osgi.config.dir=${MAGIC_DRAW_INSTALL_DIRECTORY}/configuration -Desi.system.config=${MAGIC_DRAW_INSTALL_DIRECTORY}/data/application.conf -Dlogback.configurationFile=${MAGIC_DRAW_INSTALL_DIRECTORY}/data/logback.xml -Dinstall.root=${MAGIC_DRAW_INSTALL_DIRECTORY} -Dmd.plugins.dir=${MAGIC_DRAW_INSTALL_DIRECTORY}/plugins;.." />
       <option name="PROGRAM_PARAMETERS" value="-verbose" />
       <option name="WORKING_DIRECTORY" value="file://$MODULE_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -218,17 +232,11 @@
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
   </component>
   <component name="libraryTable">
-    <library name="commons-io-2.5">
+    <library name="libs">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/plugins/WikiGeneratorPlugin/resources/libs/commons-io-2.5.jar!/" />
-      </CLASSES>
-      <JAVADOC>
         <root url="jar://$PROJECT_DIR$/plugins/WikiGeneratorPlugin/resources/libs/commons-io-2.5-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES />
-    </library>
-    <library name="javax.json-1.1.0-M2">
-      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/plugins/WikiGeneratorPlugin/resources/libs/javax-jmi-reflect.jar!/" />
+        <root url="jar://$PROJECT_DIR$/plugins/WikiGeneratorPlugin/resources/libs/commons-io-2.5.jar!/" />
         <root url="jar://$PROJECT_DIR$/plugins/WikiGeneratorPlugin/resources/libs/javax.json-1.1.0-M2.jar!/" />
         <root url="jar://$PROJECT_DIR$/plugins/WikiGeneratorPlugin/resources/libs/javax.json-api-1.0.jar!/" />
       </CLASSES>
@@ -238,17 +246,12 @@
     <library name="MagicDraw">
       <CLASSES>
         <root url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/lib" />
-        <root url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/lib/graphics" />
-        <root url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/lib/webservice" />
       </CLASSES>
       <JAVADOC>
         <root url="jar://$MAGIC_DRAW_INSTALL_DIRECTORY$/openapi/docs/javadoc.zip!/" />
-        <root url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/openapi/docs" />
       </JAVADOC>
       <SOURCES />
-      <jarDirectory url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/lib" recursive="false" />
-      <jarDirectory url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/lib/graphics" recursive="false" />
-      <jarDirectory url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/lib/webservice" recursive="false" />
+      <jarDirectory url="file://$MAGIC_DRAW_INSTALL_DIRECTORY$/lib" recursive="true" />
     </library>
   </component>
 </project>
