@@ -51,8 +51,22 @@ button#comments-copy i {
 .layer {
   box-shadow: 0 0 10px 0px rgba(0, 0, 0, 0.5); }
 
-.rst__row:hover {
-  cursor: pointer; }
+.node-parent button {
+  width: 1.5em;
+  height: 1.5em;
+  margin-left: 0.3em;
+  background: none;
+  outline: none;
+  border: none;
+  font-weight: bold;
+  text-align: center;
+  padding: 0;
+  color: #1A5DAD;
+  cursor: default; }
+
+.node-child:hover > .rst__rowContents {
+  cursor: pointer;
+  background: #E2E2E2; }
 
 .rst__rowLabel {
   padding-right: 0; }
@@ -96,10 +110,12 @@ header {
           vertical-align: -0.15em;
           font-size: 1em; }
           header .navbar .toolbar .action-button i.history-icon {
-            vertical-align: -0.1em;
+            vertical-align: -5px;
             margin-right: 2px; }
+          header .navbar .toolbar .action-button i.comment-icon {
+            vertical-align: -5px; }
           header .navbar .toolbar .action-button i.info-icon {
-            vertical-align: -0.1em; }
+            vertical-align: -5px; }
         header .navbar .toolbar .action-button:hover:not(:disabled) {
           background-color: #E0E0E0;
           color: #1E1E1E;
