@@ -47,6 +47,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
     private String dsvEmailRecipients;
     private LinkedList<String> removedDiagrams;
     private DateFormat df;
+    private String lastModifiedBy;
 
     /**
      * Initializes collections.
@@ -59,6 +60,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
         this.dsvEmailRecipients = null;
         this.project = null;
         this.df = new SimpleDateFormat("MMM d, yyyy HH:mm:ss z");
+        this.lastModifiedBy = null;
     }
 
     @Override
@@ -257,7 +259,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                 if (SVGFileLocation.exists()) {
                     String url = "diagrams/" + diagramName + ".svg".replace(" ", "%20"); // Kinda URL-encode the svg path
                     String formattedLastModified = df.format(new Date(SVGFileLocation.lastModified()));
-                    String lastModifiedBy = System.getProperty("user.name");
+                    this.lastModifiedBy = System.getProperty("user.name");
                     String diagramType = dpe.getDiagramType().getType();
 
                     JsonObjectBuilder diagramObjectBuilder = factory.createObjectBuilder()
@@ -497,8 +499,10 @@ public class ProjectListener extends ProjectEventListenerAdapter {
 
     private StringBuilder constructChangelog() {
         StringBuilder changelog = new StringBuilder();
-        // Add a timestamp
+        // Add the timestamp
         changelog.append(df.format(new Date()) + '\n');
+        // Add the user
+        changelog.append(this.lastModifiedBy + '\n');
 
         ArrayList<String> created = new ArrayList<>();
         ArrayList<String> updated = new ArrayList<>();
