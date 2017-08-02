@@ -262,7 +262,8 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                         (dpe.getDiagram());
 
                 // Test to see if diagram has an associated file
-                File SVGFileLocation = new File(diagramsDirectory + '\\' + diagramName + ".svg");
+                File SVGFileLocation = new File(diagramsDirectory + '\\' +
+                        diagramName.replace("::","_") + ".svg");
                 if (SVGFileLocation.exists()) {
                     String url = "diagrams/" + diagramName + ".svg".replace(" ", "%20"); // Kinda URL-encode the svg path
                     String formattedLastModified = df.format(new Date(SVGFileLocation.lastModified()));
@@ -489,11 +490,13 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             for (DiagramPresentationElement dpe : dirtyDiagrams.keySet()) {
                 if (dpe != null) {
                     count++;
-                    File SVGFileLocation = new File(fileLoc + '\\' + dpe.getName() + ".svg");
+                    String diagramName =  RepresentationTextCreator.getFullUMLName
+                            (dpe.getDiagram()).replace("::","_");
+                    File SVGFileLocation = new File(fileLoc + '\\' + diagramName + ".svg");
 
-                    Application.getInstance().getGUILog().log("Exporting " + dpe.getName() + ".svg to "
+                    Application.getInstance().getGUILog().log("Exporting " + diagramName + ".svg to "
                             + SVGFileLocation.getAbsolutePath() + " (" + count + "/" + total + ")", true);
-                    System.out.println("Exporting " + dpe.getName() + ".svg to "
+                    System.out.println("Exporting " + diagramName + ".svg to "
                             + SVGFileLocation.getAbsolutePath() + " (" + count + "/" + total + ")");
 
                     // This isn't actually multithreaded, MagicDraw is not thread-safe.
