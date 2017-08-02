@@ -21,7 +21,7 @@ body {
 *::-webkit-scrollbar-thumb {
   border-radius: 10px;
   -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-  background-color: #81bde2; }
+  background-color: #1A5DAD; }
 
 #main-interface {
   height: 100vh;
@@ -85,7 +85,7 @@ header {
             margin-right: 2px; }
         header .navbar .toolbar .action-button:hover:not(:disabled) {
           background-color: #E0E0E0;
-          color: #1E1E1E;
+          color: #1A5DAD;
           cursor: pointer; }
         header .navbar .toolbar .action-button:disabled {
           color: rgba(0, 0, 0, 0.26); }
@@ -105,7 +105,7 @@ header {
   flex-direction: row;
   flex-grow: 1;
   align-items: stretch;
-  height: auto;
+  max-height: calc(100% - 60px);
   /** Navigation Pane **/
   /* navigation-pane */
   /* #details-pane */ }
@@ -163,8 +163,13 @@ header {
         .main #navigation-pane #search-bar-wrapper #search-bar:focus:-ms-input-placeholder {
           color: transparent; }
     .main #navigation-pane .rst__tree {
-      height: 94.5%;
-      overflow: auto; }
+      height: 94% !important;
+      overflow: auto;
+      border: 1px dashed #1A5DAD;
+      border-radius: 0.35em; }
+      .main #navigation-pane .rst__tree > *, .main #navigation-pane .rst__tree .ReactVirtualized__List {
+        width: 100% !important;
+        height: 100% !important; }
       .main #navigation-pane .rst__tree .node-parent button {
         width: 1.5em;
         height: 1.5em;

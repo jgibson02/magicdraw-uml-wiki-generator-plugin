@@ -281,9 +281,8 @@ public class ProjectListener extends ProjectEventListenerAdapter {
 
                     JsonObjectBuilder diagramObjectBuilder = factory.createObjectBuilder()
                             .add("title", dpe.getName())
-                            .add("subtitle",
-                                    diagramName + "\n" + 
-                                            formattedLastModified + " by " + lastModifiedBy)
+                            .add("subtitle", formattedLastModified + " by " + lastModifiedBy)
+                            .add("qualifiedName", diagramName)
                             .add("url", url)
                             .add("comments", "")
                             .add("documentation", documentation);

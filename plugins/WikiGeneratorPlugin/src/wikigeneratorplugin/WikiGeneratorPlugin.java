@@ -27,7 +27,6 @@ public class WikiGeneratorPlugin extends Plugin {
      */
     @Override
     public void init() {
-        Application.getInstance().getGUILog().showMessage(new File("s:\\SitePages\\FUELEAP_NIFS_v75\\diagrams\\Modeler Notes_FUELEAP IT Infrastructure.svg").exists() ? "It exists" : "It doesn't exist");
         ActionsConfiguratorsManager manager = ActionsConfiguratorsManager.getInstance();
         MDAction action = new ToolsMenuAction();
         manager.addMainMenuConfigurator(new ToolsMenuConfigurator(action));
