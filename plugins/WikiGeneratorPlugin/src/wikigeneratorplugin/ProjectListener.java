@@ -156,7 +156,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             for (DiagramPresentationElement dpe : diagrams) {
                 // Add to dirtyDiagrams if they are not in the project file
                 // and they are in the included diagrams list
-                if (!(new File(diagramsDirectory + dpe.getName() +
+                if (!(new File(diagramsDirectory + RepresentationTextCreator.getFullUMLName(dpe.getDiagram()) +
                         ".svg")).exists() && includedDiagrams.contains(dpe.getID())) {
                     dirtyDiagrams.put(dpe, Status.CREATED);
                 }
@@ -175,7 +175,9 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                     boolean included = false;
                     // TODO: THIS CAN BE FIXED TO BE CLEANER I'M SURE
                     for (DiagramPresentationElement dpe : diagrams) {
-                        if (dpe.getName().equals(diagramNameFromFile)) {
+                        if (RepresentationTextCreator.getFullUMLName(dpe
+                                .getDiagram()).replace("::", "_").equals
+                                (diagramNameFromFile)) {
                             isInDiagrams = true;
                             if (includedDiagrams.contains(dpe.getID())) {
                                 included = true;
@@ -258,12 +260,12 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             //  PROJECTNAME_DIAGRAMS directory.
             //==========================================================================================================
             for (DiagramPresentationElement dpe : project.getDiagrams()) {
-                String diagramName = RepresentationTextCreator.getFullUMLName
-                        (dpe.getDiagram());
+                String diagramName = RepresentationTextCreator.getFullUMLName(dpe.getDiagram());
 
                 // Test to see if diagram has an associated file
-                File SVGFileLocation = new File(diagramsDirectory + '\\' + diagramName + ".svg");
-                if (SVGFileLocation.exists()) {
+                File SVGFileLocation = new File(diagramsDirectory + '\\' +
+                        diagramName.replace("::","_") + ".svg");
+                if (SVGFileLocation.getAbsoluteFile().exists()) {
                     String url = "diagrams/" + diagramName + ".svg".replace(" ", "%20"); // Kinda URL-encode the svg path
                     String formattedLastModified = df.format(new Date(SVGFileLocation.lastModified()));
                     this.lastModifiedBy = System.getProperty("user.name");
@@ -489,11 +491,15 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             for (DiagramPresentationElement dpe : dirtyDiagrams.keySet()) {
                 if (dpe != null) {
                     count++;
-                    File SVGFileLocation = new File(fileLoc + '\\' + dpe.getName() + ".svg");
-
-                    Application.getInstance().getGUILog().log("Exporting " + dpe.getName() + ".svg to "
+                    String diagramName = RepresentationTextCreator
+                            .getFullUMLName(dpe.getDiagram()).replace("::",
+                                    "_");
+                    File SVGFileLocation = new File(fileLoc + '\\' + diagramName + "" +
+                            ".svg");
+                    
+                    Application.getInstance().getGUILog().log("Exporting " + diagramName + ".svg to "
                             + SVGFileLocation.getAbsolutePath() + " (" + count + "/" + total + ")", true);
-                    System.out.println("Exporting " + dpe.getName() + ".svg to "
+                    System.out.println("Exporting " + diagramName + ".svg to "
                             + SVGFileLocation.getAbsolutePath() + " (" + count + "/" + total + ")");
 
                     // This isn't actually multithreaded, MagicDraw is not thread-safe.
@@ -528,10 +534,10 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             if (includedDiagrams.contains(dpe.getID())) {
                 switch (dirtyDiagrams.get(dpe)) {
                     case CREATED:
-                        created.add("  - " + dpe.getName());
+                        created.add("  - " + RepresentationTextCreator.getFullUMLName(dpe.getDiagram()));
                         break;
                     case UPDATED:
-                        updated.add("  - " + dpe.getName());
+                        updated.add("  - " + RepresentationTextCreator.getFullUMLName(dpe.getDiagram()));
                         break;
                 }
             }
