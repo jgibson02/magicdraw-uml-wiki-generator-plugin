@@ -5,6 +5,7 @@ import com.nomagic.magicdraw.core.Project;
 import com.nomagic.magicdraw.core.project.ProjectEventListenerAdapter;
 import com.nomagic.magicdraw.export.image.ImageExporter;
 import com.nomagic.magicdraw.uml.ExtendedPropertyNames;
+import com.nomagic.magicdraw.uml.RepresentationTextCreator;
 import com.nomagic.magicdraw.uml.symbols.DiagramListenerAdapter;
 import com.nomagic.magicdraw.uml.symbols.DiagramPresentationElement;
 import com.nomagic.uml2.ext.jmi.helpers.ModelHelper;
@@ -257,7 +258,8 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             //  PROJECTNAME_DIAGRAMS directory.
             //==========================================================================================================
             for (DiagramPresentationElement dpe : project.getDiagrams()) {
-                String diagramName = dpe.getName();
+                String diagramName = RepresentationTextCreator.getFullUMLName
+                        (dpe.getDiagram());
 
                 // Test to see if diagram has an associated file
                 File SVGFileLocation = new File(diagramsDirectory + '\\' + diagramName + ".svg");
