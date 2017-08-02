@@ -263,9 +263,9 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                 String diagramName = RepresentationTextCreator.getFullUMLName(dpe.getDiagram());
 
                 // Test to see if diagram has an associated file
-                File SVGFileLocation = new File(diagramsDirectory + '\\' +
-                        diagramName.replace("::","_") + ".svg");
                 if (SVGFileLocation.getAbsoluteFile().exists()) {
+                        diagramName.replace("::","_") + ".svg");
+                File SVGFileLocation = new File(diagramsDirectory + '\\' +
                     String url = "diagrams/" + diagramName + ".svg".replace(" ", "%20"); // Kinda URL-encode the svg path
                     String formattedLastModified = df.format(new Date(SVGFileLocation.lastModified()));
                     this.lastModifiedBy = System.getProperty("user.name");
@@ -491,12 +491,10 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             for (DiagramPresentationElement dpe : dirtyDiagrams.keySet()) {
                 if (dpe != null) {
                     count++;
-                    String diagramName = RepresentationTextCreator
-                            .getFullUMLName(dpe.getDiagram()).replace("::",
-                                    "_");
-                    File SVGFileLocation = new File(fileLoc + '\\' + diagramName + "" +
-                            ".svg");
-                    
+                    String diagramName =  RepresentationTextCreator.getFullUMLName
+                            (dpe.getDiagram()).replace("::","_");
+                    File SVGFileLocation = new File(fileLoc + '\\' + diagramName + ".svg");
+
                     Application.getInstance().getGUILog().log("Exporting " + diagramName + ".svg to "
                             + SVGFileLocation.getAbsolutePath() + " (" + count + "/" + total + ")", true);
                     System.out.println("Exporting " + diagramName + ".svg to "
