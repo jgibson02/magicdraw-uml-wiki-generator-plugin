@@ -7,6 +7,9 @@ import com.nomagic.magicdraw.export.image.ImageExporter;
 import com.nomagic.magicdraw.uml.ExtendedPropertyNames;
 import com.nomagic.magicdraw.uml.symbols.DiagramListenerAdapter;
 import com.nomagic.magicdraw.uml.symbols.DiagramPresentationElement;
+import com.nomagic.uml2.ext.jmi.helpers.ModelHelper;
+import com.nomagic.uml2.ext.jmi.helpers.StereotypesHelper;
+import com.nomagic.uml2.ext.magicdraw.mdprofiles.Stereotype;
 import org.apache.commons.io.FileUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -94,7 +97,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
 
         // Set up and prompt user if they want to upload to SharePoint and if
         // they want to have the page open or not
-        JCheckBox openWikiPageCheckbox = new JCheckBox("Open after completin?", true);
+        JCheckBox openWikiPageCheckbox = new JCheckBox("Open after completion?", true);
         JCheckBox emailCheckbox = new JCheckBox("Send email to your email list?", false);
         emailCheckbox.setEnabled(false); // Disable checkbox if user has no email recipients
         String promptMessage = "Update the wiki page on SharePoint?";
@@ -255,6 +258,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             //==========================================================================================================
             for (DiagramPresentationElement dpe : project.getDiagrams()) {
                 String diagramName = dpe.getName();
+
                 // Test to see if diagram has an associated file
                 File SVGFileLocation = new File(diagramsDirectory + '\\' + diagramName + ".svg");
                 if (SVGFileLocation.exists()) {
@@ -262,12 +266,21 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                     String formattedLastModified = df.format(new Date(SVGFileLocation.lastModified()));
                     this.lastModifiedBy = System.getProperty("user.name");
                     String diagramType = dpe.getDiagramType().getType();
+                    String modelComment = ModelHelper.getComment(dpe.getDiagram());
+                    String documentation;
+                    if (modelComment != null) {
+                         documentation = modelComment;
+                         System.out.println("Documentation for "+diagramName+": " + documentation);
+                    } else {
+                        documentation = "";
+                    }
 
                     JsonObjectBuilder diagramObjectBuilder = factory.createObjectBuilder()
                             .add("title", diagramName)
                             .add("subtitle", formattedLastModified + " by " + lastModifiedBy)
                             .add("url", url)
-                            .add("comments", "");
+                            .add("comments", "")
+                            .add("documentation", documentation);
 
                     switch (diagramType) {
                         case "SysML Activity Diagram":
@@ -345,7 +358,6 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                 File htmlDest = new File("S:/SitePages/" + project.getName() +
                         "/index.html");
                 if (!htmlDest.exists()) {
-                    System.out.println("FUCK YOU");
                     FileUtils.copyFile(new File("resources/index.html"),
                             htmlDest);
                 }

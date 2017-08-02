@@ -51,35 +51,6 @@ button#comments-copy i {
 .layer {
   box-shadow: 0 0 10px 0px rgba(0, 0, 0, 0.5); }
 
-.node-parent button {
-  width: 1.5em;
-  height: 1.5em;
-  margin-left: 0.3em;
-  background: none;
-  outline: none;
-  border: none;
-  font-weight: bold;
-  text-align: center;
-  padding: 0;
-  color: #1A5DAD;
-  cursor: default; }
-
-.node-child:hover > .rst__rowContents {
-  cursor: pointer;
-  background: #E2E2E2; }
-
-.rst__rowLabel {
-  padding-right: 0; }
-
-.rst__rowContents {
-  padding: 0 10px; }
-
-.rst__rowTitleWithSubtitle {
-  height: 1rem; }
-
-.rst__rowSubtitle {
-  font-size: 60%; }
-
 /**  Header Navigation **/
 header {
   background-color: #F7F7F7;
@@ -105,17 +76,13 @@ header {
         color: #47525E;
         background: none;
         border: none;
-        border-radius: 50%; }
+        border-radius: 50%;
+        text-align: center;
+        line-height: 50%; }
         header .navbar .toolbar .action-button i {
-          vertical-align: -0.15em;
           font-size: 1em; }
           header .navbar .toolbar .action-button i.history-icon {
-            vertical-align: -5px;
             margin-right: 2px; }
-          header .navbar .toolbar .action-button i.comment-icon {
-            vertical-align: -5px; }
-          header .navbar .toolbar .action-button i.info-icon {
-            vertical-align: -5px; }
         header .navbar .toolbar .action-button:hover:not(:disabled) {
           background-color: #E0E0E0;
           color: #1E1E1E;
@@ -147,8 +114,8 @@ header {
     padding: 1em 1.5rem;
     z-index: 500; }
   .main #navigation-pane {
-    width: 400px;
-    max-width: 400px;
+    width: 415px;
+    max-width: 415px;
     overflow-y: auto;
     /* search-bar-wrapper */ }
     .main #navigation-pane a {
@@ -160,7 +127,7 @@ header {
       /* search-bar */ }
       .main #navigation-pane #search-bar-wrapper #search-bar-icon {
         height: 40px;
-        background: white;
+        background: #F7F7F7;
         color: #75758B;
         padding-left: 0.8em;
         border-top: 1px solid rgba(0, 0, 0, 0.15);
@@ -170,6 +137,7 @@ header {
         .main #navigation-pane #search-bar-wrapper #search-bar-icon i {
           vertical-align: -14px; }
       .main #navigation-pane #search-bar-wrapper #search-bar {
+        background: #F7F7F7;
         border-radius: 0 20px 20px 0;
         padding: 0 0.5em 0 0.5em;
         width: 100%;
@@ -194,15 +162,37 @@ header {
           color: transparent; }
         .main #navigation-pane #search-bar-wrapper #search-bar:focus:-ms-input-placeholder {
           color: transparent; }
-    .main #navigation-pane > ul {
-      /* List of types */
-      margin-top: 1em;
-      list-style-type: circle; }
-      .main #navigation-pane > ul ul {
-        /* Type-specific lists */
-        list-style-type: disc; }
-      .main #navigation-pane > ul li {
-        margin-top: 0.5em; }
+    .main #navigation-pane .rst__tree {
+      height: 94.5%;
+      overflow: auto;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      background-color: #F7F7F7;
+      box-shadow: inset 0px -5px 5px 0 rgba(0, 0, 0, 0.2);
+      border-radius: 0.7em;
+      padding: 10px; }
+      .main #navigation-pane .rst__tree .node-parent button {
+        width: 1.5em;
+        height: 1.5em;
+        margin-left: 0.3em;
+        background: none;
+        outline: none;
+        border: none;
+        font-weight: bold;
+        text-align: center;
+        padding: 0;
+        color: #1A5DAD;
+        cursor: default; }
+      .main #navigation-pane .rst__tree .node-child:hover > .rst__rowContents {
+        cursor: pointer;
+        background: #E2E2E2; }
+      .main #navigation-pane .rst__tree .rst__rowLabel {
+        padding-right: 0; }
+      .main #navigation-pane .rst__tree .rst__rowContents {
+        padding: 0 10px; }
+      .main #navigation-pane .rst__tree .rst__rowTitleWithSubtitle {
+        height: 1rem; }
+      .main #navigation-pane .rst__tree .rst__rowSubtitle {
+        font-size: 60%; }
   .main #view-pane {
     background-color: #335566;
     /*#596B7F*/
