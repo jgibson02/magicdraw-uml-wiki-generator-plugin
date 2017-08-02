@@ -164,12 +164,7 @@ header {
           color: transparent; }
     .main #navigation-pane .rst__tree {
       height: 94.5%;
-      overflow: auto;
-      border: 1px solid rgba(0, 0, 0, 0.2);
-      background-color: #F7F7F7;
-      box-shadow: inset 0px -5px 5px 0 rgba(0, 0, 0, 0.2);
-      border-radius: 0.7em;
-      padding: 10px; }
+      overflow: auto; }
       .main #navigation-pane .rst__tree .node-parent button {
         width: 1.5em;
         height: 1.5em;
