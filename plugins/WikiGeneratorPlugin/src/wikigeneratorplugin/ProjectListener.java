@@ -266,7 +266,7 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                 File SVGFileLocation = new File(diagramsDirectory + '\\' +
                         diagramName.replace("::","_") + ".svg");
                 if (SVGFileLocation.getAbsoluteFile().exists()) {
-                    String url = "diagrams/" + diagramName + ".svg".replace(" ", "%20"); // Kinda URL-encode the svg path
+                    String url = ("diagrams/" + diagramName.replace("::","_") + ".svg").replace(" ", "%20"); // Kinda URL-encode the svg path
                     String formattedLastModified = df.format(new Date(SVGFileLocation.lastModified()));
                     this.lastModifiedBy = System.getProperty("user.name");
                     String diagramType = dpe.getDiagramType().getType();
@@ -280,8 +280,10 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                     }
 
                     JsonObjectBuilder diagramObjectBuilder = factory.createObjectBuilder()
-                            .add("title", diagramName)
-                            .add("subtitle", formattedLastModified + " by " + lastModifiedBy)
+                            .add("title", dpe.getName())
+                            .add("subtitle",
+                                    diagramName + "\n" + 
+                                            formattedLastModified + " by " + lastModifiedBy)
                             .add("url", url)
                             .add("comments", "")
                             .add("documentation", documentation);
