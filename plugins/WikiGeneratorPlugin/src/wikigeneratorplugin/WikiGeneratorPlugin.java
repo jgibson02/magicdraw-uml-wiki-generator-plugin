@@ -1,39 +1,52 @@
 package wikigeneratorplugin;
 
+import com.nomagic.magicdraw.actions.ActionsConfiguratorsManager;
+import com.nomagic.magicdraw.actions.MDAction;
 import com.nomagic.magicdraw.core.Application;
-import com.nomagic.magicdraw.core.Project;
-import com.nomagic.magicdraw.core.SaveParticipant;
-import com.nomagic.magicdraw.core.project.ProjectDescriptor;
-import com.nomagic.magicdraw.core.project.ProjectEventListener;
-import com.nomagic.magicdraw.export.image.ImageExporter;
 import com.nomagic.magicdraw.plugins.Plugin;
-import com.nomagic.magicdraw.uml.ExtendedPropertyNames;
-import com.nomagic.magicdraw.uml.symbols.DiagramListenerAdapter;
 import com.nomagic.magicdraw.uml.symbols.DiagramPresentationElement;
-import com.nomagic.magicdraw.uml.symbols.shapes.DiagramFrameView;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 
+/**
+ * Author: Kareem Abdol-Hamid kkabdolh
+ * Version: 6/29/2017
+ *
+ *  Main plugin class, this runs when MagicDraw is initially started up. Adds
+ * a new menu option to Tools for configuring settings of the plugin and sets
+ * up a new project listener that will activate when the project is saved and
+ * when a diagram is edited.
+ */
 public class WikiGeneratorPlugin extends Plugin {
-    private String fileLoc;
 
+    /**
+     * When the project originally initiates and adds a menu option to Tools
+     * and a projListener to do the functionality of the plugin
+     * @see ProjectListener for more details on what the plugin does
+     */
     @Override
     public void init() {
-        final HashSet<DiagramPresentationElement> dirtyDiagrams = new HashSet<>();
-        WikiGenProjectListener projListener= new WikiGenProjectListener(dirtyDiagrams);
+        ActionsConfiguratorsManager manager = ActionsConfiguratorsManager.getInstance();
+        MDAction action = new ToolsMenuAction();
+        manager.addMainMenuConfigurator(new ToolsMenuConfigurator(action));
+        ProjectListener projListener= new ProjectListener();
         Application.getInstance().getProjectsManager().addProjectListener(projListener);
     }
 
+    /**
+     * Does not need to check
+     * @return true always
+     */
     @Override
     public boolean close() {
         return true;
     }
 
+    /**
+     * No requirements for being supported
+     * @return true always
+     */
     @Override
     public boolean isSupported() {
         return true;

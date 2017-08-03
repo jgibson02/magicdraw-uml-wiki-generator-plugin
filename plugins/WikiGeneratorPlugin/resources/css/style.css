@@ -1,0 +1,259 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300,700,800|Roboto+Slab:400,100,300,700);
+/**  Basic Page CSS **/
+body {
+  font-weight: 400;
+  font-size: 2em;
+  position: relative;
+  font-size: 16px;
+  font-family: 'Lato', 'Open Sans', sans-serif;
+  overflow: hidden; }
+
+*::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  background-color: #F7F7F7; }
+
+*::-webkit-scrollbar {
+  width: 0.7em;
+  height: 0.7em;
+  background-color: #F7F7F7; }
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #1A5DAD; }
+
+#main-interface {
+  height: 100vh;
+  width: 100vw; }
+  #main-interface > * {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-height: 100vh; }
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 400;
+  margin: 0; }
+
+ul {
+  padding-left: 20px; }
+
+button#comments-copy i {
+  font-size: 1.2em; }
+
+.modal-body {
+  overflow-y: scroll;
+  max-height: 30vh; }
+
+.layer {
+  box-shadow: 0 0 10px 0px rgba(0, 0, 0, 0.5); }
+
+/**  Header Navigation **/
+header {
+  background-color: #F7F7F7;
+  z-index: 1000; }
+  header .navbar {
+    flex-grow: 0;
+    margin: 0 30px;
+    display: flex;
+    flex-direction: row;
+    border: none;
+    border-radius: 0;
+    padding: 7px 0; }
+    header .navbar .toolbar {
+      margin-left: auto;
+      height: 100%;
+      font-size: 1.75em; }
+      header .navbar .toolbar * {
+        display: inline-block; }
+      header .navbar .toolbar .action-button {
+        margin: 0 0.2em;
+        width: 1.65em;
+        height: 1.65em;
+        color: #47525E;
+        background: none;
+        border: none;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 50%; }
+        header .navbar .toolbar .action-button i {
+          font-size: 1em; }
+          header .navbar .toolbar .action-button i.history-icon {
+            margin-right: 2px; }
+        header .navbar .toolbar .action-button:hover:not(:disabled) {
+          background-color: #E0E0E0;
+          color: #1A5DAD;
+          cursor: pointer; }
+        header .navbar .toolbar .action-button:disabled {
+          color: rgba(0, 0, 0, 0.26); }
+        header .navbar .toolbar .action-button:focus {
+          outline: none; }
+  header .navbar-brand {
+    padding: 0;
+    height: 100%;
+    color: #47525E;
+    margin: auto 0;
+    font-size: 1.5em; }
+    header .navbar-brand span#project-name {
+      font-weight: bold; }
+
+.main {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  align-items: stretch;
+  max-height: calc(100% - 60px);
+  /** Navigation Pane **/
+  /* navigation-pane */
+  /* #details-pane */ }
+  .main aside {
+    background-color: #D6DCE9;
+    padding: 1em 1.5rem;
+    z-index: 500; }
+  .main #navigation-pane {
+    width: 415px;
+    max-width: 415px;
+    overflow-y: auto;
+    /* search-bar-wrapper */ }
+    .main #navigation-pane a {
+      color: #0275d8; }
+    .main #navigation-pane #search-bar-wrapper {
+      display: flex;
+      flex-direction: row;
+      margin-bottom: 0.7em;
+      /* search-bar */ }
+      .main #navigation-pane #search-bar-wrapper #search-bar-icon {
+        height: 40px;
+        background: #F7F7F7;
+        color: #75758B;
+        padding-left: 0.8em;
+        border-top: 1px solid rgba(0, 0, 0, 0.15);
+        border-left: 1px solid rgba(0, 0, 0, 0.15);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+        border-radius: 20px 0 0 20px; }
+        .main #navigation-pane #search-bar-wrapper #search-bar-icon i {
+          vertical-align: -14px; }
+      .main #navigation-pane #search-bar-wrapper #search-bar {
+        background: #F7F7F7;
+        border-radius: 0 20px 20px 0;
+        padding: 0 0.5em 0 0.5em;
+        width: 100%;
+        height: 40px;
+        border-left: none;
+        border-top: 1px solid rgba(0, 0, 0, 0.15);
+        border-right: 1px solid rgba(0, 0, 0, 0.15);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+        /* Make placeholder text disappear on focus */
+        /* FF 4-18 */
+        /* FF 19+ */
+        /* IE 10+ */ }
+        .main #navigation-pane #search-bar-wrapper #search-bar:focus {
+          outline: none; }
+        .main #navigation-pane #search-bar-wrapper #search-bar::placeholder {
+          font-weight: bold; }
+        .main #navigation-pane #search-bar-wrapper #search-bar:focus::-webkit-input-placeholder {
+          color: transparent; }
+        .main #navigation-pane #search-bar-wrapper #search-bar:focus:-moz-placeholder {
+          color: transparent; }
+        .main #navigation-pane #search-bar-wrapper #search-bar:focus::-moz-placeholder {
+          color: transparent; }
+        .main #navigation-pane #search-bar-wrapper #search-bar:focus:-ms-input-placeholder {
+          color: transparent; }
+    .main #navigation-pane .rst__tree {
+      height: 94% !important;
+      overflow: auto;
+      border: 1px dashed #1A5DAD;
+      border-radius: 0.35em; }
+      .main #navigation-pane .rst__tree > *, .main #navigation-pane .rst__tree .ReactVirtualized__List {
+        width: 100% !important;
+        height: 100% !important; }
+      .main #navigation-pane .rst__tree .node-parent button {
+        width: 1.5em;
+        height: 1.5em;
+        margin-left: 0.3em;
+        background: none;
+        outline: none;
+        border: none;
+        font-weight: bold;
+        text-align: center;
+        padding: 0;
+        color: #1A5DAD;
+        cursor: default; }
+      .main #navigation-pane .rst__tree .node-child:hover > .rst__rowContents {
+        cursor: pointer;
+        background: #E2E2E2; }
+      .main #navigation-pane .rst__tree .rst__rowLabel {
+        padding-right: 0; }
+      .main #navigation-pane .rst__tree .rst__rowContents {
+        padding: 0 10px; }
+      .main #navigation-pane .rst__tree .rst__rowTitleWithSubtitle {
+        height: 1rem; }
+      .main #navigation-pane .rst__tree .rst__rowSubtitle {
+        font-size: 60%; }
+  .main #view-pane {
+    background-color: #335566;
+    /*#596B7F*/
+    background-image: url("../images/NASA_logo.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    flex-grow: 1;
+    box-shadow: inset 0 0px 5px 3px rgba(0, 0, 0, 0.15); }
+    .main #view-pane > * {
+      width: 100%;
+      height: 100%; }
+  .main #details-pane {
+    flex-grow: 0;
+    display: flex;
+    flex-direction: column;
+    width: 340px;
+    max-width: 340px;
+    /* details-list */
+    /* .comments-wrapper */ }
+    .main #details-pane #details-list {
+      margin-top: 1em;
+      border-collapse: collapse;
+      width: 100%; }
+      .main #details-pane #details-list thead > tr {
+        border-bottom: 2px solid #94989F; }
+      .main #details-pane #details-list tr {
+        padding: 0.3em;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        vertical-align: top; }
+        .main #details-pane #details-list tr td {
+          padding: 0.4em 0;
+          font-weight: bold;
+          word-break: break-all;
+          width: 5em; }
+          .main #details-pane #details-list tr td:last-child {
+            padding-left: 0.6em;
+            font-weight: normal;
+            width: auto; }
+    .main #details-pane .comments-wrapper {
+      margin-top: auto; }
+      .main #details-pane .comments-wrapper textarea {
+        width: 100%;
+        border-radius: 10px;
+        padding: 0.5em;
+        resize: none; }
+        .main #details-pane .comments-wrapper textarea:focus {
+          outline: none;
+          border: 2px solid #9ec5e5;
+          /* Make placeholder text disappear on focus */
+          /* FF 4-18 */
+          /* FF 19+ */
+          /* IE 10+ */ }
+          .main #details-pane .comments-wrapper textarea:focus::placeholder {
+            font-weight: bold; }
+          .main #details-pane .comments-wrapper textarea:focus::-webkit-input-placeholder {
+            color: transparent; }
+          .main #details-pane .comments-wrapper textarea:focus:-moz-placeholder {
+            color: transparent; }
+          .main #details-pane .comments-wrapper textarea:focus:-moz-placeholder {
+            color: transparent; }
+          .main #details-pane .comments-wrapper textarea:focus:-ms-input-placeholder {
+            color: transparent; }
+
+/* .main */
