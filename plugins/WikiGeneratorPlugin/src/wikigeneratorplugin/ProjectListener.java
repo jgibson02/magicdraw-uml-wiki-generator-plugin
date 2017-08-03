@@ -71,7 +71,6 @@ public class ProjectListener extends ProjectEventListenerAdapter {
     public void projectOpened(final Project project) {
         this.project = project;
         this.diagramsDirectory = "s:\\SitePages\\" + project.getName() + "\\diagrams\\";
-        Application.getInstance().getProjectsManager().addProjectListener(this);
         DiagramListenerAdapter adapter = new DiagramListenerAdapter(evt -> {
             String propertyName = evt.getPropertyName();
             if (propertyName.equals(ExtendedPropertyNames.BOUNDS)) {
@@ -106,9 +105,9 @@ public class ProjectListener extends ProjectEventListenerAdapter {
 
         boolean xmlExists = true;
         try {
-            // Parse projectconfig.xml for diagrams that need to be included
+            // Parse project.xml for diagrams that need to be included
             File fXmlFile = new File
-                    ("resources/config/" + project.getName() + "config.xml");
+                    ("resources/config/" + project.getName() + ".xml");
             if (fXmlFile.exists() == false) {
                 xmlExists = false;
             } else {
@@ -161,6 +160,13 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                     dirtyDiagrams.put(dpe, Status.CREATED);
                 }
             }
+
+            for (DiagramPresentationElement dpe : dirtyDiagrams.keySet()) {
+                if (!includedDiagrams.contains(dpe.getID())) {
+                    dirtyDiagrams.remove(dpe);
+                }
+            }
+
             //==========================================================================================================
             //  Iterate over every .svg in project's folder, check if it is in the list of project diagrams and is in
             //  the include list, and if not: delete.
@@ -264,17 +270,17 @@ public class ProjectListener extends ProjectEventListenerAdapter {
 
                 // Test to see if diagram has an associated file
                 File SVGFileLocation = new File(diagramsDirectory + '\\' +
-                        diagramName.replace("::","_") + ".svg");
+                        diagramName.replace("::", "_") + ".svg");
                 if (SVGFileLocation.getAbsoluteFile().exists()) {
-                    String url = ("diagrams/" + diagramName.replace("::","_") + ".svg").replace(" ", "%20"); // Kinda URL-encode the svg path
+                    String url = ("diagrams/" + diagramName.replace("::", "_") + ".svg").replace(" ", "%20"); // Kinda URL-encode the svg path
                     String formattedLastModified = df.format(new Date(SVGFileLocation.lastModified()));
                     this.lastModifiedBy = System.getProperty("user.name");
                     String diagramType = dpe.getDiagramType().getType();
                     String modelComment = ModelHelper.getComment(dpe.getDiagram());
                     String documentation;
                     if (modelComment != null) {
-                         documentation = modelComment;
-                         System.out.println("Documentation for "+diagramName+": " + documentation);
+                        documentation = modelComment;
+                        System.out.println("Documentation for " + diagramName + ": " + documentation);
                     } else {
                         documentation = "";
                     }
@@ -504,13 +510,12 @@ public class ProjectListener extends ProjectEventListenerAdapter {
                             + SVGFileLocation.getAbsolutePath() + " (" + count + "/" + total + ")");
 
                     // This isn't actually multithreaded, MagicDraw is not thread-safe.
-                    new Thread(() -> {
-                        try {
-                            ImageExporter.export(dpe, ImageExporter.SVG, SVGFileLocation);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }).start();
+
+                    try {
+                        ImageExporter.export(dpe, ImageExporter.SVG, SVGFileLocation);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 } // End if-statement
                 Application.getInstance().getGUILog().log((int) Math.round((((double) count / (double) total) * 100)) + "% Complete", true);
                 System.out.println((int) Math.round(((count / (double) total) * 100)) + "% " + "Complete");

@@ -96,7 +96,7 @@ public class ConfigurationPopupMenu extends JFrame {
         }
         included = dpes;
 
-        File fXmlFile = new File("resources/config/" + project.getName() + "config.xml");
+        File fXmlFile = new File("resources/config/" + project.getName() + ".xml");
 
         // Retrieve user settings from XML file
         LinkedList<String> includedDiagrams = new LinkedList<String>();
@@ -281,7 +281,7 @@ public class ConfigurationPopupMenu extends JFrame {
     private void generateXML() {
         try {
             // Set up file and doc builder
-            File fXmlFile = new File("resources/config/" + project.getName() + "config.xml");
+            File fXmlFile = new File("resources/config/" + project.getName() + ".xml");
             // If the file doesn't already exist, create it
             if (!fXmlFile.exists()) {
                 createNewXML(fXmlFile);
