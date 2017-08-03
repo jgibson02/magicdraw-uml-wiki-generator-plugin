@@ -116,6 +116,7 @@ header {
   .main #navigation-pane {
     width: 415px;
     max-width: 415px;
+    max-height: 100%;
     overflow-y: auto;
     /* search-bar-wrapper */ }
     .main #navigation-pane a {
@@ -164,12 +165,14 @@ header {
           color: transparent; }
     .main #navigation-pane .rst__tree {
       height: 94% !important;
+      max-height: 94%;
       overflow: auto;
       border: 1px dashed #1A5DAD;
       border-radius: 0.35em; }
       .main #navigation-pane .rst__tree > *, .main #navigation-pane .rst__tree .ReactVirtualized__List {
         width: 100% !important;
-        height: 100% !important; }
+        height: 100% !important;
+        max-height: 100%; }
       .main #navigation-pane .rst__tree .node-parent button {
         width: 1.5em;
         height: 1.5em;
