@@ -155,7 +155,9 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             for (DiagramPresentationElement dpe : diagrams) {
                 // Add to dirtyDiagrams if they are not in the project file
                 // and they are in the included diagrams list
-                if (!(new File(diagramsDirectory + RepresentationTextCreator.getFullUMLName(dpe.getDiagram()) +
+                if (!(new File(diagramsDirectory + "\\"
+                        +RepresentationTextCreator
+                        .getFullUMLName(dpe.getDiagram()).replace("::","_") +
                         ".svg")).exists() && includedDiagrams.contains(dpe.getID())) {
                     dirtyDiagrams.put(dpe, Status.CREATED);
                 }
