@@ -11,7 +11,6 @@ import com.nomagic.magicdraw.uml.symbols.DiagramPresentationElement;
 import com.nomagic.uml2.ext.jmi.helpers.ModelHelper;
 import com.nomagic.uml2.ext.jmi.helpers.StereotypesHelper;
 import com.nomagic.uml2.ext.magicdraw.mdprofiles.Stereotype;
-import org.apache.commons.io.FileUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -28,6 +27,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -356,23 +357,59 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             //  Copies webpage dependencies to project's SharePoint folder if they don't exist.
             //==========================================================================================================
             try {
-                File cssDest = new File("S:/SitePages/" + project.getName() + "/css");
-                if (!cssDest.exists())
-                    FileUtils.copyDirectory(new File("resources/css"), cssDest);
+                File cssDirDest = new File("S:/SitePages/" + project.getName()
+                        + "/css");
+                if (!cssDirDest.exists()) {
+                    cssDirDest.mkdirs();
+                    File cssSource = new File("resources/css");
+                    File[] cssFiles = cssSource.listFiles();
+                    for (File f : cssFiles) {
+                        Files.copy(f.toPath(), new File(cssDirDest
+                                + "/" + f.getName()).toPath(),
+                                StandardCopyOption
+                                .REPLACE_EXISTING);
+                    }
+                }
 
-                File imagesDest = new File("S:/SitePages/" + project.getName() + "/images");
-                if (!imagesDest.exists())
-                    FileUtils.copyDirectory(new File("resources/images"), imagesDest);
+                File imagesDirDest = new File("S:/SitePages/" + project.getName
+                        () + "/images");
+                if (!imagesDirDest.exists()) {
+                    imagesDirDest.mkdirs();
+                    File imagesSource = new File("resources/images");
+                    File[] imagesFiles = imagesSource.listFiles();
+                    for (File f : imagesFiles) {
+                        Files.copy(f.toPath(), new File(imagesDirDest
+                                + "/" + f.getName()).toPath(), StandardCopyOption
+                                .REPLACE_EXISTING);
+                    }
+                }
 
-                File jsDest = new File("S:/SitePages/" + project.getName() + "/js");
-                if (!jsDest.exists())
-                    FileUtils.copyDirectory(new File("resources/js"), jsDest);
+                File jsDirDest = new File("S:/SitePages/" + project.getName()
+                        + "/js");
+                if (!jsDirDest.exists()) {
+                    jsDirDest.mkdirs();
+                    File jsSource = new File("resources/js");
+                    File[] jsFiles = jsSource.listFiles();
+                    for (File f : jsFiles) {
+                        Files.copy(f.toPath(), new File(jsDirDest
+                                + "/" + f.getName()).toPath(), StandardCopyOption
+                                .REPLACE_EXISTING);
+                    }
+                }
 
                 File htmlDest = new File("S:/SitePages/" + project.getName() +
                         "/index.html");
                 if (!htmlDest.exists()) {
-                    FileUtils.copyFile(new File("resources/index.html"),
-                            htmlDest);
+                    File htmlSource = new File("resources/index.html");
+                    Files.copy(htmlSource.toPath(), htmlDest.toPath(),
+                            StandardCopyOption
+                            .REPLACE_EXISTING);
+                }
+                File changelogDest = new File("S:/SitePages/" + project.getName
+                        () +
+                        "/changelog.txt");
+                if (!changelogDest.exists()) {
+                    changelogDest.createNewFile();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -402,20 +439,20 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             //  Constructs this session's changes and adds it to the on-disk changelog.
             //==========================================================================================================
             // Update changelog on disk
-            File changelogFile = new File("S:/SitePages/" + project.getName()
-                    + "/changelog.txt");
-            if (changelogFile.exists()) {
-                try {
-                    changelog.append(FileUtils.readFileToString(changelogFile, StandardCharsets.US_ASCII));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            try {
-                FileUtils.writeStringToFile(changelogFile, changelog.toString(), StandardCharsets.US_ASCII);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+//            File changelogFile = new File("S:/SitePages/" + project.getName()
+//                    + "/changelog.txt");
+//            if (changelogFile.exists()) {
+//                try {
+//                    changelog.append(FileUtils.readFileToString(changelogFile, StandardCharsets.US_ASCII));
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            try {
+//                FileUtils.writeStringToFile(changelogFile, changelog.toString(), StandardCharsets.US_ASCII);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
 
             //==========================================================================================================
 
@@ -445,17 +482,24 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             projectJsonObject = projectObjectBuilder.build();
 
             // Writes assembled JSON to disk.
-            File jsonLocation = new File("S:/SitePages/" + project.getName() + "/js/data.txt");
+            File jsonDirLocation = new File("S:/SitePages/" + project.getName
+                    () + "/js/");
+            File jsonFileLocation = new File("S:/SitePages/" + project
+                    .getName() + "/js/data.txt");
             try {
-                if (!jsonLocation.exists()) {
-                    jsonLocation.createNewFile();
+                if (!jsonDirLocation.exists() || !jsonFileLocation.exists()) {
+                    jsonDirLocation.mkdirs();
+                    jsonFileLocation.createNewFile();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            Application.getInstance().getGUILog().log("Writing project JSON to: " + jsonLocation.getAbsolutePath());
-            System.out.println("Writing project JSON to: " + jsonLocation.getAbsolutePath());
-            try (JsonWriter writer = Json.createWriterFactory(null).createWriter(new FileOutputStream(jsonLocation))) {
+            Application.getInstance().getGUILog().log("Writing project JSON " +
+                    "to: " + jsonFileLocation.getAbsolutePath());
+            System.out.println("Writing project JSON to: " + jsonFileLocation
+                    .getAbsolutePath());
+            try (JsonWriter writer = Json.createWriterFactory(null)
+                    .createWriter(new FileOutputStream(jsonFileLocation))) {
                 writer.writeObject(projectJsonObject);
             } catch (FileNotFoundException e) {
                 Application.getInstance().getGUILog().showMessage(e.getMessage());

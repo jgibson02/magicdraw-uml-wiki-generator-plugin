@@ -196,12 +196,7 @@
           <component id="bb849" class="javax.swing.JList" binding="includesList">
             <constraints/>
             <properties>
-              <model>
-                <item value="FUELEAP Context"/>
-                <item value="ARMD NGO"/>
-                <item value="NASA Aircraft Structure"/>
-                <item value="Cat in the Hat"/>
-              </model>
+              <model/>
               <selectionMode value="0"/>
             </properties>
           </component>
