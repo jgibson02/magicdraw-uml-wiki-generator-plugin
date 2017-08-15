@@ -21,10 +21,7 @@ import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.awt.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -439,20 +436,23 @@ public class ProjectListener extends ProjectEventListenerAdapter {
             //  Constructs this session's changes and adds it to the on-disk changelog.
             //==========================================================================================================
             // Update changelog on disk
-//            File changelogFile = new File("S:/SitePages/" + project.getName()
-//                    + "/changelog.txt");
-//            if (changelogFile.exists()) {
-//                try {
-//                    changelog.append(FileUtils.readFileToString(changelogFile, StandardCharsets.US_ASCII));
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//            try {
-//                FileUtils.writeStringToFile(changelogFile, changelog.toString(), StandardCharsets.US_ASCII);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
+            File changelogFile = new File("S:/SitePages/" + project.getName()
+                    + "/changelog.txt");
+            if (changelogFile.exists()) {
+                try (FileInputStream changelogInputStream = new FileInputStream(changelogFile);) {
+                    Scanner changelogScanner = new Scanner(changelogInputStream);
+                    while (changelogScanner.hasNextLine()) {
+                        changelog.append(changelogScanner.nextLine() + "\n");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            try (PrintWriter changelogOutputWriter = new PrintWriter(changelogFile);) {
+                changelogOutputWriter.write(changelog.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             //==========================================================================================================
 
